@@ -9,7 +9,7 @@
     ],
     "outputDirectory": "packages/widget-live-poll/docs/screenshots",
     "auditStatus": "fixture-needed",
-    "auditReason": "The package is release-ready with honest interim Marketplace artwork; deterministic Layout Builder and public-page fixtures still need capture.",
+    "auditReason": "Real widget pages and editor routes are prepared; authentic browser recapture and visual acceptance remain required.",
     "entries": [
         {
             "id": "widget-live-poll-extension-card",
@@ -33,27 +33,39 @@
             "targetType": "admin-surface",
             "target": "Layout Builder page editor",
             "required": false,
-            "notes": "Capture the poll fields and a public voted state with the selected option and aggregate result bars visible. Capture the editor state before the page is published.",
+            "notes": "Capture the real page editor for the dedicated seeded widget page. Open its content builder and expand the configured widget fields; a generic page form is not acceptance. The sidebar variant must also show the open admin sidebar.",
             "useCase": "An editor can see the fields used to configure the Live Poll widget.",
             "url": "/screenshot-fixtures/widgets/live-poll/editor",
-            "waitFor": "[data-widget-screenshot-fixture=\"editor\"]",
+            "waitFor": ".fi-fo-builder",
             "colorSchemes": ["light"],
-            "screenshotPath": "packages/widget-live-poll/docs/screenshots/live-poll-layout-builder-editor.png"
+            "screenshotPath": "packages/widget-live-poll/docs/screenshots/live-poll-layout-builder-editor.png",
+            "user": "admin",
+            "requiredViewport": {
+                "width": 1440,
+                "height": 900
+            },
+            "viewport": "desktop"
         },
         {
             "id": "live-poll-public-output",
-            "title": "Illustrative live poll public output preview.",
+            "title": "Live Poll public output",
             "package": "widget-live-poll",
             "surface": "frontend",
             "targetType": "frontend-url",
-            "target": "/screenshot-fixtures/catalogue/widget-live-poll/live-poll-public-output",
+            "target": "/screenshot-fixtures/widgets/live-poll/public",
             "required": true,
-            "notes": "Illustrative deterministic catalogue fixture, not a live package UI capture. Capture the poll fields and a public voted state with the selected option and aggregate result bars visible. Verify the rendered HTML contains no authoring controls, field paths, model identifiers, or signed admin URLs.",
+            "notes": "Capture the installed public page rendered from the package widget definition, with its real assets and local media. Verify the visible widget and its interaction; reject empty, unavailable or unstyled output.",
             "useCase": "A visitor casts one privacy-safe vote and immediately sees aggregate results.",
-            "url": "/screenshot-fixtures/catalogue/widget-live-poll/live-poll-public-output",
+            "url": "/screenshot-fixtures/widgets/live-poll/public",
             "colorSchemes": ["light", "dark"],
             "screenshotPath": "packages/widget-live-poll/docs/screenshots/live-poll-public-output.png",
-            "fixtureKind": "illustrative-catalogue"
+            "user": false,
+            "waitFor": ".capell-live-poll",
+            "requiredViewport": {
+                "width": 1440,
+                "height": 900
+            },
+            "viewport": "desktop"
         },
         {
             "id": "widget-live-poll-admin-sidebar-menu-open",
@@ -63,10 +75,10 @@
             "targetType": "admin-surface",
             "target": "Layout Builder page editor",
             "required": false,
-            "notes": "Capture the poll fields and a public voted state with the selected option and aggregate result bars visible. Capture the editor state before the page is published. Capture this same admin surface with the fully collapsible sidebar opened.",
+            "notes": "Capture the real page editor for the dedicated seeded widget page. Open its content builder and expand the configured widget fields; a generic page form is not acceptance. The sidebar variant must also show the open admin sidebar.",
             "useCase": "An editor can see the fields used to configure the Live Poll widget.",
             "url": "/screenshot-fixtures/widgets/live-poll/editor",
-            "waitFor": "[data-widget-screenshot-fixture=\"editor\"]",
+            "waitFor": ".fi-fo-builder",
             "colorSchemes": ["light"],
             "screenshotPath": "packages/widget-live-poll/docs/screenshots/widget-live-poll-admin-sidebar-menu-open.png",
             "beforeWait": [
@@ -74,7 +86,13 @@
                     "type": "click",
                     "selector": ".fi-topbar-open-collapse-sidebar-btn"
                 }
-            ]
+            ],
+            "user": "admin",
+            "requiredViewport": {
+                "width": 1440,
+                "height": 900
+            },
+            "viewport": "desktop"
         }
     ]
 }
