@@ -35,29 +35,88 @@ Screenshot contract: `docs/screenshots.json`.
 
 ![Live Poll Widget extension card](docs/screenshots/extension-card.svg)
 
-![Live Poll fields in Layout Builder](docs/screenshots/live-poll-layout-builder-editor.png)
+![Illustrative live poll public output preview](docs/screenshots/live-poll-public-output.png)
 
-- Live Poll Widget extension card (marketplace, required).
-- Live Poll fields in Layout Builder (admin, optional).
-- Live Poll public output (frontend, optional).
+- Live Poll Widget extension card (marketplace, required evidence).
+- Live Poll fields in Layout Builder (admin, supplementary evidence).
+- Illustrative live poll public output preview (frontend, required evidence).
+- Live Poll fields in Layout Builder with admin sidebar menu open (admin, supplementary evidence).
 
 ## Technical Shape
 
-- Service providers: `Capell\WidgetLivePoll\Providers\WidgetLivePollServiceProvider`.
-- Config files: `packages/widget-live-poll/config/capell-widget-live-poll.php`.
-- Migrations: `packages/widget-live-poll/database/migrations/2026_07_09_000001_create_capell_polls_table.php`, `packages/widget-live-poll/database/migrations/2026_07_09_000002_create_capell_poll_options_table.php`, `packages/widget-live-poll/database/migrations/2026_07_09_000003_create_capell_poll_votes_table.php`.
-- Models: `Poll`, `PollOption`, `PollVote`.
-- Filament classes: `LivePollWidget`.
-- Route files: `packages/widget-live-poll/routes/web.php`.
-- Listeners: `SyncPublishedPollsListener`.
-- Actions: `CastPollVoteAction`, `PruneClosedPollVotersAction`, `ResolveLivePollPayloadsAction`, `SyncPublishedPollAction`.
-- Data objects: `LivePollInputData`, `LivePollRenderData`, `LivePollRenderOptionData`, `PollOptionInputData`, `PollPublicationData`, `PollVoteResultData`.
-- Scheduled commands: `capell:polls:prune-voters (daily)`.
-- Console command classes: `PrunePollVotersCommand`.
-- Manifest contributions: `content-widget: Capell\WidgetLivePoll\WidgetLivePollContribution`, `scheduled-job: Capell\WidgetLivePoll\Manifest\LivePollPruneScheduleContribution`.
-- Health checks: `Capell\WidgetLivePoll\Health\WidgetLivePollHealthCheck`.
-- Blade views: `packages/widget-live-poll/resources/views/widget.blade.php`.
-- Cache tags: `widget-live-poll`.
+### Service providers
+
+- `Capell\WidgetLivePoll\Providers\WidgetLivePollServiceProvider`
+
+### Config files
+
+- `packages/widget-live-poll/config/capell-widget-live-poll.php`
+
+### Migrations
+
+- `packages/widget-live-poll/database/migrations/2026_07_09_000001_create_capell_polls_table.php`
+- `packages/widget-live-poll/database/migrations/2026_07_09_000002_create_capell_poll_options_table.php`
+- `packages/widget-live-poll/database/migrations/2026_07_09_000003_create_capell_poll_votes_table.php`
+
+### Models
+
+- `Poll`
+- `PollOption`
+- `PollVote`
+
+### Filament classes
+
+- `LivePollWidget`
+
+### Route files
+
+- `packages/widget-live-poll/routes/web.php`
+
+### Listeners
+
+- `SyncPublishedPollsListener`
+
+### Actions
+
+- `CastPollVoteAction`
+- `PruneClosedPollVotersAction`
+- `ResolveLivePollPayloadsAction`
+- `SyncPublishedPollAction`
+
+### Data objects
+
+- `LivePollInputData`
+- `LivePollRenderData`
+- `LivePollRenderOptionData`
+- `PollOptionInputData`
+- `PollPublicationData`
+- `PollVoteResultData`
+
+### Scheduled commands
+
+- `capell:polls:prune-voters (daily; package registered)`
+
+### Console command classes
+
+- `PrunePollVotersCommand`
+
+### Manifest contributions
+
+- `content-widget: Capell\WidgetLivePoll\WidgetLivePollContribution`
+- `scheduled-job: Capell\WidgetLivePoll\Manifest\LivePollPruneScheduleContribution`
+
+### Health checks
+
+- `Capell\WidgetLivePoll\Health\WidgetLivePollHealthCheck`
+
+### Blade views
+
+- `packages/widget-live-poll/resources/views/widget.blade.php`
+
+### Cache tags
+
+- `widget-live-poll`
+
 
 ## Data Model
 
@@ -66,19 +125,19 @@ Screenshot contract: `docs/screenshots.json`.
 - Core record references in migrations: `sites via site_id`, `languages via language_id`.
 - Migration files: `2026_07_09_000001_create_capell_polls_table.php`, `2026_07_09_000002_create_capell_poll_options_table.php`, `2026_07_09_000003_create_capell_poll_votes_table.php`.
 - Migration impact: run host migrations through the package install flow before opening package surfaces.
-- Deletion/retention behaviour: migrations declare cascade-on-delete relationships; retention is scheduled through `capell:polls:prune-voters` (daily).
+- Deletion/retention behaviour: migrations declare cascade-on-delete relationships; retention is scheduled through `capell:polls:prune-voters` (daily; registered by the package provider).
 
 ## Install Impact
 
 - Required packages: `capell-app/admin`, `capell-app/core`, `capell-app/frontend`, `capell-app/layout-builder`.
 - Admin navigation: no admin page or resource contribution is declared.
 - Admin/editor extensions: `content-widget: WidgetLivePollContribution`.
-- Permissions: none declared in `capell.json`.
+- Permissions: no package permission declarations or Shield gates detected; host access rules still apply.
 - Public routes: loads `routes/web.php`.
 - Database changes: package migrations are declared.
 - Config: `config/capell-widget-live-poll.php`.
 - Settings: no package settings declared.
-- Queues or schedules: scheduled commands `capell:polls:prune-voters (daily)`.
+- Queues or schedules: scheduled commands `capell:polls:prune-voters (daily; package registered)`.
 - Cache tags: `widget-live-poll`.
 - Commands: console command classes detected: `PrunePollVotersCommand`.
 
@@ -88,7 +147,7 @@ Screenshot contract: `docs/screenshots.json`.
 - Run migrations before opening package resources or public routes.
 - Review package configuration before production-like verification: `config/capell-widget-live-poll.php`.
 - Review middleware, throttling, signatures, and public-output safety in `routes/web.php` before exposing routes.
-- Register the host scheduler so these declared commands run at their documented frequencies: `capell:polls:prune-voters (daily)`.
+- Keep the host Laravel scheduler running so package-registered schedules can execute: `capell:polls:prune-voters (daily; package registered)`.
 - Keep public Blade and cached HTML free of authoring markers, model IDs, permissions, signed editor URLs, and lazy database queries.
 - Custom write integrations must preserve invalidation for `widget-live-poll` cache tags.
 
@@ -105,8 +164,7 @@ Screenshot contract: `docs/screenshots.json`.
 ## Quick Start
 
 1. Install the package: `composer require capell-app/widget-live-poll`.
-2. Run the required setup: `php artisan migrate`.
-3. Open the package detail or install-intent surface and confirm the Live Poll Widget extension card is present.
+2. Open `/screenshot-fixtures/catalogue/widget-live-poll/live-poll-public-output` and confirm the public output renders without admin state.
 
 ## Next Steps
 
