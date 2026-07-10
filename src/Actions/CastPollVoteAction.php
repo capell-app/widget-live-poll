@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\WidgetLivePoll\Actions;
 
 use Capell\WidgetLivePoll\Data\PollVoteResultData;
+use Capell\WidgetLivePoll\Enums\PollResultsVisibility;
 use Capell\WidgetLivePoll\Models\Poll;
 use Capell\WidgetLivePoll\Models\PollOption;
 use Capell\WidgetLivePoll\Models\PollVote;
@@ -19,20 +20,22 @@ final class CastPollVoteAction
 
     public function handle(Poll $poll, string $optionId, string $voterCookie): PollVoteResultData
     {
-        if (! $poll->acceptsVotes()) {
-            throw new RuntimeException('Poll is not open.');
-        }
-
-        $option = $poll->options()->where('stable_id', $optionId)->whereNull('archived_at')->first();
-        if (! $option instanceof PollOption) {
-            throw new RuntimeException('Poll option is unavailable.');
-        }
-
         $voterHash = $this->voterHash($poll, $voterCookie);
         $accepted = false;
+
         try {
-            DB::transaction(function () use ($poll, $option, $voterHash, &$accepted): void {
-                PollVote::query()->create(['poll_id' => $poll->getKey(), 'poll_option_id' => $option->getKey(), 'voter_hash' => $voterHash]);
+            DB::transaction(function () use ($poll, $optionId, $voterHash, &$accepted): void {
+                $lockedPoll = Poll::query()->lockForUpdate()->find($poll->getKey());
+                if (! $lockedPoll instanceof Poll || ! $lockedPoll->acceptsVotes()) {
+                    throw new RuntimeException('Poll is not open.');
+                }
+
+                $option = $lockedPoll->options()->where('stable_id', $optionId)->whereNull('archived_at')->lockForUpdate()->first();
+                if (! $option instanceof PollOption) {
+                    throw new RuntimeException('Poll option is unavailable.');
+                }
+
+                PollVote::query()->create(['poll_id' => $lockedPoll->getKey(), 'poll_option_id' => $option->getKey(), 'voter_hash' => $voterHash]);
                 PollOption::query()->whereKey($option->getKey())->increment('votes_count');
                 $accepted = true;
             });
@@ -42,7 +45,9 @@ final class CastPollVoteAction
             }
         }
 
-        return new PollVoteResultData(accepted: $accepted, hasVoted: true, results: $this->results($poll));
+        $poll->refresh();
+
+        return new PollVoteResultData(accepted: $accepted, hasVoted: true, results: $this->resultsForViewer($poll, true));
     }
 
     public function voterHasVoted(Poll $poll, ?string $voterCookie): bool
@@ -58,7 +63,12 @@ final class CastPollVoteAction
 
     public function shouldExposeResults(Poll $poll, bool $hasVoted = false): bool
     {
-        return $poll->results_visibility === 'always' || $hasVoted || ($poll->results_visibility === 'after_close' && ! $poll->acceptsVotes());
+        return match (PollResultsVisibility::tryFrom($poll->results_visibility)) {
+            PollResultsVisibility::Always => true,
+            PollResultsVisibility::AfterVote => $hasVoted,
+            PollResultsVisibility::AfterClose => $poll->hasClosed(),
+            null => false,
+        };
     }
 
     public function resultsForViewer(Poll $poll, bool $hasVoted = false): ?array

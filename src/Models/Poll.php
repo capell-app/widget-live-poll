@@ -44,6 +44,13 @@ final class Poll extends Model
         return $this->is_active && ($this->opens_at === null || $this->opens_at->lte($now)) && ($this->closes_at === null || $this->closes_at->gt($now));
     }
 
+    public function hasClosed(?CarbonImmutable $now = null): bool
+    {
+        $now ??= CarbonImmutable::now();
+
+        return $this->closes_at !== null && $this->closes_at->lte($now);
+    }
+
     protected function casts(): array
     {
         return ['opens_at' => 'immutable_datetime', 'closes_at' => 'immutable_datetime', 'is_active' => 'boolean'];
