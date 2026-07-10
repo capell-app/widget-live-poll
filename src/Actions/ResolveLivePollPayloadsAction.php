@@ -15,7 +15,7 @@ use Spatie\LaravelData\DataCollection;
 
 final readonly class ResolveLivePollPayloadsAction implements WidgetExtensionBatchPayloadResolver
 {
-    public function __construct(private PollReferenceCodec $references) {}
+    public function __construct(private PollReferenceCodec $references, private CastPollVoteAction $votes) {}
 
     public function resolve(WidgetExtensionPayloadBatchData $batch): array
     {
@@ -45,7 +45,7 @@ final readonly class ResolveLivePollPayloadsAction implements WidgetExtensionBat
                 $options[] = new LivePollRenderOptionData($option->stable_id, $option->label, $option->votes_count);
             }
             $base = url('/_capell/widget-polls/' . $reference);
-            $resolved[$item->instanceId] = new LivePollRenderData(question: $poll->question, options: new DataCollection(LivePollRenderOptionData::class, $options), available: true, open: $poll->acceptsVotes(), bootstrapUrl: $base . '/bootstrap', voteUrl: $base . '/vote', resultsUrl: $base . '/results', resultsVisibility: $poll->results_visibility);
+            $resolved[$item->instanceId] = new LivePollRenderData(question: $poll->question, options: new DataCollection(LivePollRenderOptionData::class, $options), available: true, open: $poll->acceptsVotes(), bootstrapUrl: $base . '/bootstrap', voteUrl: $base . '/vote', resultsUrl: $base . '/results', resultsVisibility: $poll->results_visibility, showResults: $this->votes->shouldExposeResults($poll));
         }
 
         return $resolved;

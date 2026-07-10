@@ -85,12 +85,12 @@ it('reports definition authoring view assets tables routes and pruning as health
         ->and(WidgetLivePollHealthCheck::passed())->toBeTrue();
 });
 
-it('renders an escaped static fallback without stable identities or package metadata', function (): void {
+it('renders an escaped static fallback without stable identities or hidden counts', function (): void {
     $renderData = new LivePollRenderData(
         question: '<script>Choose</script>',
         options: new DataCollection(LivePollRenderOptionData::class, [
-            new LivePollRenderOptionData((string) Str::uuid(), '<img src=x>'),
-            new LivePollRenderOptionData((string) Str::uuid(), 'Second'),
+            new LivePollRenderOptionData((string) Str::uuid(), '<img src=x>', 42),
+            new LivePollRenderOptionData((string) Str::uuid(), 'Second', 7),
         ]),
     );
 
@@ -99,14 +99,37 @@ it('renders an escaped static fallback without stable identities or package meta
     expect($html)->toContain('&lt;script&gt;Choose&lt;/script&gt;')
         ->toContain('&lt;img src=x&gt;')
         ->not->toContain('capell-app.live-poll')
-        ->not->toContain('instance_id');
+        ->not->toContain('>42<')
+        ->not->toContain('>7<');
 });
 
-it('bootstraps a host-only voter cookie and serves isolated aggregate etags', function (): void {
+it('renders public totals only when results are visible to everyone', function (): void {
+    $visibleRenderData = new LivePollRenderData(
+        question: 'Choose',
+        options: new DataCollection(LivePollRenderOptionData::class, [
+            new LivePollRenderOptionData((string) Str::uuid(), 'One', 12),
+            new LivePollRenderOptionData((string) Str::uuid(), 'Two', 3),
+        ]),
+        showResults: true,
+    );
+
+    $visibleHtml = view('capell-widget-live-poll::widget', ['renderData' => $visibleRenderData])->render();
+
+    expect($visibleHtml)->toContain('>12<')
+        ->toContain('>3<');
+});
+
+it('bootstraps a host-only voter cookie and keeps results private until they are visible', function (): void {
     $language = Language::factory()->english()->create();
     $site = Site::factory()->language($language)->create();
     SiteDomain::factory()->site($site)->language($language)->create([
         'domain' => 'poll.test',
+        'scheme' => 'http',
+        'path' => null,
+        'status' => true,
+    ]);
+    SiteDomain::factory()->site(Site::factory()->language($language)->create())->language($language)->create([
+        'domain' => 'other.test',
         'scheme' => 'http',
         'path' => null,
         'status' => true,
@@ -129,7 +152,8 @@ it('bootstraps a host-only voter cookie and serves isolated aggregate etags', fu
 
     $bootstrap = getJson('http://poll.test/_capell/widget-polls/' . $reference . '/bootstrap')
         ->assertOk()
-        ->assertHeader('Cache-Control', 'no-store, private')
+        ->assertHeader('Cache-Control', 'private, no-store')
+        ->assertJson(['has_voted' => false, 'open' => true, 'results' => null])
         ->assertJsonStructure(['csrf_token', 'has_voted', 'open', 'results']);
     $cookie = collect($bootstrap->baseResponse->headers->getCookies())
         ->first(static fn (Cookie $candidate): bool => $candidate->getName() === 'capell_poll_voter');
@@ -152,7 +176,7 @@ it('bootstraps a host-only voter cookie and serves isolated aggregate etags', fu
     withHeader('X-CSRF-TOKEN', $csrfToken);
     $vote = postJson('http://poll.test/_capell/widget-polls/' . $reference . '/vote', ['option_id' => $optionId])
         ->assertOk()
-        ->assertHeader('Cache-Control', 'no-store, private')
+        ->assertHeader('Cache-Control', 'private, no-store')
         ->assertJson(['accepted' => true, 'hasVoted' => true]);
     withCredentials();
     withCookie('capell_poll_voter', $rawVoterCookie);
@@ -161,16 +185,92 @@ it('bootstraps a host-only voter cookie and serves isolated aggregate etags', fu
         ->assertOk()
         ->assertJson(['accepted' => false, 'hasVoted' => true]);
 
+    withCredentials();
+    withCookie('capell_poll_voter', $rawVoterCookie);
+    getJson('http://poll.test/_capell/widget-polls/' . $reference . '/bootstrap')
+        ->assertOk()
+        ->assertJson(['has_voted' => true, 'results' => [$optionId => 1]]);
+
     $results = getJson('http://poll.test/_capell/widget-polls/' . $reference . '/results')
         ->assertOk()
-        ->assertHeader('Cache-Control', 'max-age=30, public')
-        ->assertHeader('ETag');
-    $etag = $results->baseResponse->headers->get('ETag');
-    throw_unless(is_string($etag));
-    withHeader('If-None-Match', $etag);
+        ->assertHeader('Cache-Control', 'private, no-store')
+        ->assertJson(['results' => null]);
+    withCookie('capell_poll_voter', $rawVoterCookie);
     getJson('http://poll.test/_capell/widget-polls/' . $reference . '/results')
-        ->assertStatus(304);
+        ->assertOk()
+        ->assertJson(['results' => [$optionId => 1]]);
     getJson('http://other.test/_capell/widget-polls/' . $reference . '/bootstrap')
         ->assertNotFound();
+    getJson('http://poll.test/_capell/widget-polls/not-a-reference/bootstrap')
+        ->assertNotFound();
+    postJson('http://poll.test/_capell/widget-polls/not-a-reference/vote', ['option_id' => $optionId])
+        ->assertNotFound();
+    getJson('http://poll.test/_capell/widget-polls/not-a-reference/results')
+        ->assertNotFound();
+    $otherPoll = resolve(SyncPublishedPollAction::class)->handle(new PollPublicationData(
+        siteId: $site->id,
+        pageableType: 'page',
+        pageableId: 21,
+        languageId: $language->id,
+        widgetInstanceId: (string) Str::uuid(),
+        question: 'Choose later',
+        options: new DataCollection(PollOptionInputData::class, [
+            ['id' => (string) Str::uuid(), 'label' => 'One'],
+            ['id' => (string) Str::uuid(), 'label' => 'Two'],
+        ]),
+        closesAt: now()->addHour()->toAtomString(),
+        resultsVisibility: 'after_close',
+    ));
+    $otherReference = resolve(PollReferenceCodec::class)->encode($otherPoll);
+    getJson('http://other.test/_capell/widget-polls/' . $otherReference . '/bootstrap')
+        ->assertNotFound();
+    postJson('http://other.test/_capell/widget-polls/' . $otherReference . '/vote', ['option_id' => $optionId])
+        ->assertNotFound();
+    getJson('http://other.test/_capell/widget-polls/' . $otherReference . '/results')
+        ->assertNotFound();
     expect($vote->json('results.' . $optionId))->toBe(1);
+});
+
+it('shows after-close results only after the poll closes', function (): void {
+    $language = Language::factory()->english()->create();
+    $site = Site::factory()->language($language)->create();
+    SiteDomain::factory()->site($site)->language($language)->create([
+        'domain' => 'poll.test',
+        'scheme' => 'http',
+        'path' => null,
+        'status' => true,
+    ]);
+    $optionId = (string) Str::uuid();
+    $poll = resolve(SyncPublishedPollAction::class)->handle(new PollPublicationData(
+        siteId: $site->id,
+        pageableType: 'page',
+        pageableId: 30,
+        languageId: $language->id,
+        widgetInstanceId: (string) Str::uuid(),
+        question: 'Choose',
+        options: new DataCollection(PollOptionInputData::class, [
+            ['id' => $optionId, 'label' => 'One'],
+            ['id' => (string) Str::uuid(), 'label' => 'Two'],
+        ]),
+        closesAt: now()->addHour()->toAtomString(),
+        resultsVisibility: 'after_close',
+    ));
+    $reference = resolve(PollReferenceCodec::class)->encode($poll);
+
+    getJson('http://poll.test/_capell/widget-polls/' . $reference . '/bootstrap')
+        ->assertOk()
+        ->assertJson(['results' => null]);
+    getJson('http://poll.test/_capell/widget-polls/' . $reference . '/results')
+        ->assertOk()
+        ->assertJson(['results' => null]);
+
+    $poll->update(['closes_at' => now()->subMinute()]);
+    $poll->refresh();
+
+    getJson('http://poll.test/_capell/widget-polls/' . $reference . '/bootstrap')
+        ->assertOk()
+        ->assertJson(['results' => [$optionId => 0]]);
+    getJson('http://poll.test/_capell/widget-polls/' . $reference . '/results')
+        ->assertOk()
+        ->assertJson(['results' => [$optionId => 0]]);
 });

@@ -45,6 +45,31 @@ final class CastPollVoteAction
         return new PollVoteResultData(accepted: $accepted, hasVoted: true, results: $this->results($poll));
     }
 
+    public function voterHasVoted(Poll $poll, ?string $voterCookie): bool
+    {
+        if (! is_string($voterCookie) || $voterCookie === '') {
+            return false;
+        }
+
+        $voterHash = $this->voterHash($poll, $voterCookie);
+
+        return PollVote::query()->where('poll_id', $poll->getKey())->where('voter_hash', $voterHash)->exists();
+    }
+
+    public function shouldExposeResults(Poll $poll, bool $hasVoted = false): bool
+    {
+        return $poll->results_visibility === 'always' || $hasVoted || ($poll->results_visibility === 'after_close' && ! $poll->acceptsVotes());
+    }
+
+    public function resultsForViewer(Poll $poll, bool $hasVoted = false): ?array
+    {
+        if (! $this->shouldExposeResults($poll, $hasVoted)) {
+            return null;
+        }
+
+        return $this->results($poll);
+    }
+
     public function voterHash(Poll $poll, string $voterCookie): string
     {
         return hash_hmac('sha256', 'capell:live-poll:v1:' . $poll->id, $voterCookie);

@@ -20,12 +20,9 @@ final readonly class PollResultsController
         if (! $poll instanceof Poll) {
             abort(404);
         }
-        $results = $this->votes->results($poll);
-        $etag = '"' . hash('sha256', json_encode($results, JSON_THROW_ON_ERROR)) . '"';
-        if ($request->header('If-None-Match') === $etag) {
-            return response()->json(null, 304)->header('ETag', $etag)->header('Cache-Control', 'public, max-age=30');
-        }
+        $hasVoted = $this->votes->voterHasVoted($poll, $request->cookie('capell_poll_voter'));
+        $results = $this->votes->resultsForViewer($poll, $hasVoted);
 
-        return response()->json(['results' => $results])->header('ETag', $etag)->header('Cache-Control', 'public, max-age=30');
+        return response()->json(['results' => $results])->header('Cache-Control', 'private, no-store');
     }
 }
