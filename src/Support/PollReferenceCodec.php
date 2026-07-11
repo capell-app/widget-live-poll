@@ -10,6 +10,7 @@ use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\Crypt;
 use JsonException;
 use RuntimeException;
+use SodiumException;
 
 final readonly class PollReferenceCodec
 {
@@ -44,7 +45,7 @@ final readonly class PollReferenceCodec
             $poll = Poll::query()->find($payload['id']);
 
             return $poll instanceof Poll && $poll->site_id === $payload['s'] && $poll->language_id === $payload['l'] && $poll->is_active ? $poll : null;
-        } catch (DecryptException|JsonException|RuntimeException $exception) {
+        } catch (DecryptException|JsonException|RuntimeException|SodiumException $exception) {
             return null;
         }
     }

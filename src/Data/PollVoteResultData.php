@@ -8,6 +8,6 @@ use Spatie\LaravelData\Data;
 
 final class PollVoteResultData extends Data
 {
-    /** @param array<string, int> $results */
-    public function __construct(public bool $accepted, public bool $hasVoted, public array $results) {}
+    /** @param array<string, int>|null $results */
+    public function __construct(public bool $accepted, public bool $hasVoted, public ?array $results) {}
 }

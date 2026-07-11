@@ -4,9 +4,14 @@ declare(strict_types=1);
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
+use Capell\LayoutBuilder\Data\WidgetExtensions\WidgetExtensionPayloadBatchData;
+use Capell\LayoutBuilder\Data\WidgetExtensions\WidgetExtensionPayloadInputData;
+use Capell\LayoutBuilder\Data\WidgetExtensions\WidgetExtensionRenderContextData;
 use Capell\WidgetLivePoll\Actions\CastPollVoteAction;
 use Capell\WidgetLivePoll\Actions\PruneClosedPollVotersAction;
+use Capell\WidgetLivePoll\Actions\ResolveLivePollPayloadsAction;
 use Capell\WidgetLivePoll\Actions\SyncPublishedPollAction;
+use Capell\WidgetLivePoll\Data\LivePollInputData;
 use Capell\WidgetLivePoll\Data\LivePollRenderData;
 use Capell\WidgetLivePoll\Data\LivePollRenderOptionData;
 use Capell\WidgetLivePoll\Data\PollOptionInputData;
@@ -66,6 +71,76 @@ it('counts a browser once with an atomic durable counter', function (): void {
     $duplicate = resolve(CastPollVoteAction::class)->handle($poll, $optionId, 'browser-secret');
     expect($first->accepted)->toBeTrue()->and($duplicate->accepted)->toBeFalse()->and(PollVote::query()->count())->toBe(1)->and(PollOption::query()->where('stable_id', $optionId)->value('votes_count'))->toBe(1);
 });
+
+it('rechecks mutable poll state inside the vote transaction', function (): void {
+    $optionId = (string) Str::uuid();
+    $poll = resolve(SyncPublishedPollAction::class)->handle(livePollPublication([
+        ['id' => $optionId, 'label' => 'One'],
+        ['id' => (string) Str::uuid(), 'label' => 'Two'],
+    ]));
+
+    $poll->newQuery()->whereKey($poll->getKey())->update(['closes_at' => now()->subSecond()]);
+
+    expect(fn () => resolve(CastPollVoteAction::class)->handle($poll, $optionId, 'late-browser'))
+        ->toThrow(RuntimeException::class, 'Poll is not open.')
+        ->and(PollVote::query()->count())->toBe(0)
+        ->and(PollOption::query()->where('stable_id', $optionId)->value('votes_count'))->toBe(0);
+});
+
+it('applies each results visibility policy without leaking after-close totals to voters', function (): void {
+    $optionId = (string) Str::uuid();
+    $publication = livePollPublication([
+        ['id' => $optionId, 'label' => 'One'],
+        ['id' => (string) Str::uuid(), 'label' => 'Two'],
+    ]);
+    $publication->resultsVisibility = 'after_close';
+    $publication->closesAt = now()->addHour()->toAtomString();
+    $poll = resolve(SyncPublishedPollAction::class)->handle($publication);
+
+    $vote = resolve(CastPollVoteAction::class)->handle($poll, $optionId, 'browser-secret');
+
+    expect($vote->accepted)->toBeTrue()
+        ->and($vote->results)->toBeNull()
+        ->and(resolve(CastPollVoteAction::class)->resultsForViewer($poll, true))->toBeNull();
+
+    $poll->update(['opens_at' => now()->addHour(), 'closes_at' => now()->addHours(2)]);
+    $poll->refresh();
+    expect(resolve(CastPollVoteAction::class)->resultsForViewer($poll, true))->toBeNull();
+
+    $poll->update(['opens_at' => null, 'closes_at' => now()->subSecond()]);
+    $poll->refresh();
+    expect(resolve(CastPollVoteAction::class)->resultsForViewer($poll, false))->toMatchArray([$optionId => 1]);
+
+    $poll->update(['results_visibility' => 'invalid']);
+    $poll->refresh();
+    expect(resolve(CastPollVoteAction::class)->resultsForViewer($poll, true))->toBeNull();
+});
+
+it('removes private totals from shared render payloads', function (): void {
+    $optionId = (string) Str::uuid();
+    $publication = livePollPublication([
+        ['id' => $optionId, 'label' => 'One'],
+        ['id' => (string) Str::uuid(), 'label' => 'Two'],
+    ]);
+    $poll = resolve(SyncPublishedPollAction::class)->handle($publication);
+    $poll->options()->where('stable_id', $optionId)->increment('votes_count', 9);
+    $input = new LivePollInputData($publication->question, $publication->options, resultsVisibility: 'after_vote');
+    $batch = new WidgetExtensionPayloadBatchData(
+        [new WidgetExtensionPayloadInputData($publication->widgetInstanceId, $input)],
+        new WidgetExtensionRenderContextData(null),
+    );
+
+    $privatePayload = resolve(ResolveLivePollPayloadsAction::class)->resolve($batch)[$publication->widgetInstanceId];
+
+    expect($privatePayload->showResults)->toBeFalse()
+        ->and($privatePayload->options->toCollection()->pluck('votesCount')->all())->toBe([0, 0]);
+
+    $poll->update(['results_visibility' => 'always']);
+    $publicPayload = resolve(ResolveLivePollPayloadsAction::class)->resolve($batch)[$publication->widgetInstanceId];
+
+    expect($publicPayload->showResults)->toBeTrue()
+        ->and($publicPayload->options->toCollection()->pluck('votesCount')->all())->toBe([9, 0]);
+});
 it('prunes voter hashes after closure without deleting aggregate counts', function (): void {
     $optionId = (string) Str::uuid();
     $data = livePollPublication([['id' => $optionId, 'label' => 'One'], ['id' => (string) Str::uuid(), 'label' => 'Two']]);
@@ -115,8 +190,8 @@ it('renders public totals only when results are visible to everyone', function (
 
     $visibleHtml = view('capell-widget-live-poll::widget', ['renderData' => $visibleRenderData])->render();
 
-    expect($visibleHtml)->toContain('>12<')
-        ->toContain('>3<');
+    expect($visibleHtml)->toMatch('/<strong>\s*12\s*<\/strong>/')
+        ->toMatch('/<strong>\s*3\s*<\/strong>/');
 });
 
 it('bootstraps a host-only voter cookie and keeps results private until they are visible', function (): void {
@@ -152,7 +227,7 @@ it('bootstraps a host-only voter cookie and keeps results private until they are
 
     $bootstrap = getJson('http://poll.test/_capell/widget-polls/' . $reference . '/bootstrap')
         ->assertOk()
-        ->assertHeader('Cache-Control', 'private, no-store')
+        ->assertHeader('Cache-Control', 'no-store, private')
         ->assertJson(['has_voted' => false, 'open' => true, 'results' => null])
         ->assertJsonStructure(['csrf_token', 'has_voted', 'open', 'results']);
     $cookie = collect($bootstrap->baseResponse->headers->getCookies())
@@ -176,7 +251,7 @@ it('bootstraps a host-only voter cookie and keeps results private until they are
     withHeader('X-CSRF-TOKEN', $csrfToken);
     $vote = postJson('http://poll.test/_capell/widget-polls/' . $reference . '/vote', ['option_id' => $optionId])
         ->assertOk()
-        ->assertHeader('Cache-Control', 'private, no-store')
+        ->assertHeader('Cache-Control', 'no-store, private')
         ->assertJson(['accepted' => true, 'hasVoted' => true]);
     withCredentials();
     withCookie('capell_poll_voter', $rawVoterCookie);
@@ -191,9 +266,9 @@ it('bootstraps a host-only voter cookie and keeps results private until they are
         ->assertOk()
         ->assertJson(['has_voted' => true, 'results' => [$optionId => 1]]);
 
-    $results = getJson('http://poll.test/_capell/widget-polls/' . $reference . '/results')
+    $results = withCookie('capell_poll_voter', 'other-browser-secret')->getJson('http://poll.test/_capell/widget-polls/' . $reference . '/results')
         ->assertOk()
-        ->assertHeader('Cache-Control', 'private, no-store')
+        ->assertHeader('Cache-Control', 'no-store, private')
         ->assertJson(['results' => null]);
     withCookie('capell_poll_voter', $rawVoterCookie);
     getJson('http://poll.test/_capell/widget-polls/' . $reference . '/results')

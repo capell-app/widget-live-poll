@@ -40,12 +40,13 @@ final readonly class ResolveLivePollPayloadsAction implements WidgetExtensionBat
             }
 
             $reference = $this->references->encode($poll);
+            $showResults = $this->votes->shouldExposeResults($poll);
             $options = [];
-            foreach ($poll->options()->get() as $option) {
-                $options[] = new LivePollRenderOptionData($option->stable_id, $option->label, $option->votes_count);
+            foreach ($poll->options as $option) {
+                $options[] = new LivePollRenderOptionData($option->stable_id, $option->label, $showResults ? $option->votes_count : 0);
             }
             $base = url('/_capell/widget-polls/' . $reference);
-            $resolved[$item->instanceId] = new LivePollRenderData(question: $poll->question, options: new DataCollection(LivePollRenderOptionData::class, $options), available: true, open: $poll->acceptsVotes(), bootstrapUrl: $base . '/bootstrap', voteUrl: $base . '/vote', resultsUrl: $base . '/results', resultsVisibility: $poll->results_visibility, showResults: $this->votes->shouldExposeResults($poll));
+            $resolved[$item->instanceId] = new LivePollRenderData(question: $poll->question, options: new DataCollection(LivePollRenderOptionData::class, $options), available: true, open: $poll->acceptsVotes(), bootstrapUrl: $base . '/bootstrap', voteUrl: $base . '/vote', resultsUrl: $base . '/results', resultsVisibility: $poll->results_visibility, showResults: $showResults);
         }
 
         return $resolved;
