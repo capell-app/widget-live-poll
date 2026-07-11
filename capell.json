@@ -36,6 +36,7 @@
     "contributes": [
         {
             "type": "content-widget",
+            "key": "capell-app.live-poll",
             "class": "Capell\\WidgetLivePoll\\WidgetLivePollContribution"
         },
         {

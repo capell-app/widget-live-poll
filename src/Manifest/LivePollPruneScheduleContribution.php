@@ -10,6 +10,6 @@ final class LivePollPruneScheduleContribution implements RunsScheduledExtensionJ
 {
     public static function compatibleCapellApiVersion(): string
     {
-        return '^4.1';
+        return '^1.0';
     }
 }
