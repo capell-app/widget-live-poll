@@ -1,0 +1,172 @@
+{
+    "manifest-version": 3,
+    "name": "capell-app/widget-live-poll",
+    "slug": "widget-live-poll",
+    "displayName": "Live Poll Widget",
+    "kind": "package",
+    "capellApiVersion": "^1.0",
+    "version": "1.x-dev",
+    "description": "Locale-specific single-choice polls with stable options, transactional vote counters, privacy-safe voter identity, and aggregate caching.",
+    "product": {
+        "group": "Capell Foundation",
+        "tier": "free",
+        "bundle": "foundation"
+    },
+    "namespace": "Capell\\WidgetLivePoll",
+    "surfaces": ["admin", "frontend", "console"],
+    "dependencies": {
+        "requires": [
+            "capell-app/admin",
+            "capell-app/core",
+            "capell-app/frontend",
+            "capell-app/layout-builder"
+        ],
+        "supports": [],
+        "conflicts": []
+    },
+    "providers": {
+        "metadata": [],
+        "install": [],
+        "runtime": [
+            "Capell\\WidgetLivePoll\\Providers\\WidgetLivePollServiceProvider"
+        ],
+        "admin": [],
+        "frontend": []
+    },
+    "contributes": [
+        {
+            "type": "content-widget",
+            "key": "capell-app.live-poll",
+            "class": "Capell\\WidgetLivePoll\\WidgetLivePollContribution"
+        },
+        {
+            "type": "scheduled-job",
+            "class": "Capell\\WidgetLivePoll\\Manifest\\LivePollPruneScheduleContribution",
+            "command": "capell:polls:prune-voters",
+            "frequency": "daily"
+        }
+    ],
+    "database": {
+        "migrations": true,
+        "settings": false,
+        "requiredTables": [
+            "capell_polls",
+            "capell_poll_options",
+            "capell_poll_votes"
+        ]
+    },
+    "commands": {
+        "install": null,
+        "setup": null,
+        "setupParams": [],
+        "demo": null,
+        "doctor": null
+    },
+    "settings": [],
+    "permissions": [],
+    "capabilities": ["frontend.interactive"],
+    "security": {
+        "riskTier": "high",
+        "publicSurface": {
+            "routeNames": [
+                "capell.widget-live-poll.bootstrap",
+                "capell.widget-live-poll.vote",
+                "capell.widget-live-poll.results"
+            ],
+            "auth": "session-bootstrap",
+            "csrfExemptRoutes": [],
+            "signedRoutes": [],
+            "tokenizedRoutes": [
+                "capell.widget-live-poll.bootstrap",
+                "capell.widget-live-poll.vote",
+                "capell.widget-live-poll.results"
+            ],
+            "webhookRoutes": [],
+            "throttledRoutes": [
+                "capell.widget-live-poll.bootstrap",
+                "capell.widget-live-poll.vote",
+                "capell.widget-live-poll.results"
+            ]
+        },
+        "sensitiveData": {
+            "encryptedFields": [],
+            "hashedTokenFields": ["capell_poll_votes.voter_hash"],
+            "redactedOutputClasses": [
+                "Capell\\WidgetLivePoll\\Data\\PollVoteResultData"
+            ],
+            "plaintextJustifications": []
+        },
+        "publicOutput": {
+            "cacheSafe": true,
+            "forbidAuthoringSurface": true,
+            "forbidSecrets": true,
+            "forbidPublicBladeQueries": true
+        },
+        "externalHttpClients": {
+            "requiresTimeouts": false,
+            "requiresSecretRedaction": false,
+            "clients": []
+        },
+        "adminSurface": {
+            "authorization": "panel-auth",
+            "permissions": []
+        }
+    },
+    "performance": {
+        "frontendRenderBudgetMs": 15,
+        "adminQueryBudget": 3,
+        "cacheTags": ["widget-live-poll"],
+        "cacheSafety": {
+            "cacheable": true,
+            "variesBy": ["site", "locale", "theme"],
+            "sensitiveOutput": false,
+            "invalidationSources": [
+                {
+                    "model": "Capell\\Core\\Models\\Page",
+                    "events": [
+                        "created",
+                        "updated",
+                        "deleted",
+                        "restored",
+                        "forceDeleted"
+                    ]
+                },
+                {
+                    "model": "Capell\\WidgetLivePoll\\Models\\Poll",
+                    "events": ["created", "updated", "deleted"]
+                },
+                {
+                    "model": "Capell\\WidgetLivePoll\\Models\\PollOption",
+                    "events": ["created", "updated", "deleted"]
+                }
+            ],
+            "queueInvalidation": false
+        }
+    },
+    "healthChecks": [
+        {
+            "key": "widget-live-poll.package-health",
+            "label": "Live Poll widget package health",
+            "class": "Capell\\WidgetLivePoll\\Health\\WidgetLivePollHealthCheck",
+            "severity": "critical",
+            "surface": "frontend"
+        }
+    ],
+    "commercial": {
+        "proposedLicense": "free",
+        "requestedCertification": "first-party",
+        "supportPolicy": "capell-first-party",
+        "privateDocsRequested": false
+    },
+    "marketplace": {
+        "summary": "Transactional live polls with privacy-safe one-vote browser identity.",
+        "screenshots": [
+            {
+                "path": "docs/assets/marketplace/extension-card.jpg",
+                "alt": "Live Poll widget preview",
+                "caption": "Live Poll widget"
+            }
+        ],
+        "categories": ["foundation", "frontend", "interactive"]
+    }
+}
