@@ -181,7 +181,13 @@
   },
   "marketplace": {
     "summary": "Transactional live polls with privacy-safe one-vote browser identity.",
-    "screenshots": [],
+    "screenshots": [
+        {
+            "path": "docs/assets/marketplace/extension-card.svg",
+            "alt": "Live Poll widget beta marketplace artwork",
+            "caption": "Interim beta artwork for the Live Poll widget while the documented Layout Builder fixture is captured."
+        }
+    ],
     "categories": [
       "foundation",
       "frontend",
