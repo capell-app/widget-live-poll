@@ -12,6 +12,19 @@
     "auditReason": "The package is release-ready with honest interim Marketplace artwork; deterministic Layout Builder and public-page fixtures still need capture.",
     "entries": [
         {
+            "id": "widget-live-poll-extension-card",
+            "title": "Live Poll Widget extension card.",
+            "package": "widget-live-poll",
+            "surface": "marketplace",
+            "targetType": "marketplace-asset",
+            "target": "extension-card",
+            "required": true,
+            "path": "docs/assets/marketplace/extension-card.svg",
+            "screenshotPath": "packages/widget-live-poll/docs/screenshots/extension-card.svg",
+            "notes": "Committed Beta Marketplace card artwork for Live Poll Widget.",
+            "useCase": "A buyer reviews the Beta extension card before enabling Live Poll Widget."
+        },
+        {
             "id": "live-poll-layout-builder-editor",
             "title": "Live Poll fields in Layout Builder.",
             "package": "widget-live-poll",
