@@ -1,0 +1,52 @@
+{
+    "package": "widget-live-poll",
+    "composerName": "capell-app/widget-live-poll",
+    "generatedFor": "deployment-screenshot-runner",
+    "requiresInstalledPackage": true,
+    "composerRequires": [
+        "capell-app/widget-live-poll",
+        "capell-app/layout-builder"
+    ],
+    "outputDirectory": "packages/widget-live-poll/docs/screenshots",
+    "auditStatus": "fixture-needed",
+    "auditReason": "The package is release-ready with honest interim Marketplace artwork; deterministic Layout Builder and public-page fixtures still need capture.",
+    "entries": [
+        {
+            "id": "widget-live-poll-extension-card",
+            "title": "Live Poll Widget extension card.",
+            "package": "widget-live-poll",
+            "surface": "marketplace",
+            "targetType": "marketplace-asset",
+            "target": "extension-card",
+            "required": true,
+            "path": "docs/assets/marketplace/extension-card.svg",
+            "screenshotPath": "packages/widget-live-poll/docs/screenshots/extension-card.svg",
+            "notes": "Committed Beta Marketplace card artwork for Live Poll Widget.",
+            "useCase": "A buyer reviews the Beta extension card before enabling Live Poll Widget."
+        },
+        {
+            "id": "live-poll-layout-builder-editor",
+            "title": "Live Poll fields in Layout Builder.",
+            "package": "widget-live-poll",
+            "surface": "admin",
+            "targetType": "admin-surface",
+            "target": "Layout Builder page editor",
+            "required": false,
+            "notes": "Capture the poll fields and a public voted state with the selected option and aggregate result bars visible. Capture the editor state before the page is published.",
+            "useCase": "An editor can see the fields used to configure the Live Poll widget.",
+            "screenshotPath": "packages/widget-live-poll/docs/screenshots/live-poll-layout-builder-editor.png"
+        },
+        {
+            "id": "live-poll-public-output",
+            "title": "Live Poll public output.",
+            "package": "widget-live-poll",
+            "surface": "frontend",
+            "targetType": "artifact",
+            "target": "Seeded public page fixture",
+            "required": false,
+            "notes": "Capture the poll fields and a public voted state with the selected option and aggregate result bars visible. Verify the rendered HTML contains no authoring controls, field paths, model identifiers, or signed admin URLs.",
+            "useCase": "A visitor casts one privacy-safe vote and immediately sees aggregate results.",
+            "screenshotPath": "packages/widget-live-poll/docs/screenshots/live-poll-public-output.png"
+        }
+    ]
+}
