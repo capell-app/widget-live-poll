@@ -29,6 +29,8 @@ Status details:
 
 Screenshot contract: `docs/screenshots.json`.
 
+![Live Poll Widget extension card](docs/screenshots/extension-card.svg)
+
 - Live Poll Widget extension card (marketplace, required).
 - Live Poll fields in Layout Builder (admin, optional).
 - Live Poll public output (frontend, optional).
