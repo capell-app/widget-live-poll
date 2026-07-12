@@ -4,8 +4,8 @@
     "slug": "widget-live-poll",
     "displayName": "Live Poll Widget",
     "kind": "package",
-    "capellApiVersion": "^4.0",
-    "version": "1.x-dev",
+    "capellApiVersion": "^0.0",
+    "version": "0.0.x-dev",
     "description": "Locale-specific single-choice polls with stable options, transactional vote counters, privacy-safe voter identity, and aggregate caching.",
     "product": {
         "group": "Capell Foundation",
