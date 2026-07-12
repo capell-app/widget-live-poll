@@ -16,7 +16,7 @@ final class WidgetLivePollHealthCheck extends AbstractWidgetExtensionHealthCheck
 {
     public static function compatibleCapellApiVersion(): string
     {
-        return '^1.0';
+        return '^0.0';
     }
 
     public static function runDiagnostics(): Collection
