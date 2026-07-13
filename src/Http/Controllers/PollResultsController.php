@@ -20,7 +20,8 @@ final readonly class PollResultsController
         if (! $poll instanceof Poll) {
             abort(404);
         }
-        $hasVoted = $this->votes->voterHasVoted($poll, $request->cookie('capell_poll_voter'));
+        $cookie = $request->cookie('capell_poll_voter');
+        $hasVoted = $this->votes->voterHasVoted($poll, is_string($cookie) ? $cookie : null);
         $results = $this->votes->resultsForViewer($poll, $hasVoted);
 
         return response()->json(['results' => $results])->header('Cache-Control', 'private, no-store');

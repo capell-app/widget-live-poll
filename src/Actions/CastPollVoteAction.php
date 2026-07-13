@@ -71,6 +71,7 @@ final class CastPollVoteAction
         };
     }
 
+    /** @return array<string, int>|null */
     public function resultsForViewer(Poll $poll, bool $hasVoted = false): ?array
     {
         if (! $this->shouldExposeResults($poll, $hasVoted)) {

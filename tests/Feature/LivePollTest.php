@@ -131,12 +131,14 @@ it('removes private totals from shared render payloads', function (): void {
     );
 
     $privatePayload = resolve(ResolveLivePollPayloadsAction::class)->resolve($batch)[$publication->widgetInstanceId];
+    throw_unless($privatePayload instanceof LivePollRenderData, RuntimeException::class, 'Expected a private live poll render payload.');
 
     expect($privatePayload->showResults)->toBeFalse()
         ->and($privatePayload->options->toCollection()->pluck('votesCount')->all())->toBe([0, 0]);
 
     $poll->update(['results_visibility' => 'always']);
     $publicPayload = resolve(ResolveLivePollPayloadsAction::class)->resolve($batch)[$publication->widgetInstanceId];
+    throw_unless($publicPayload instanceof LivePollRenderData, RuntimeException::class, 'Expected a public live poll render payload.');
 
     expect($publicPayload->showResults)->toBeTrue()
         ->and($publicPayload->options->toCollection()->pluck('votesCount')->all())->toBe([9, 0]);
