@@ -27,13 +27,9 @@ Status details:
 
 ## Screens And Workflow
 
-Screenshot contract: `docs/screenshots.json`.
+Marketplace media is declared in `capell.json`:
 
-![Live Poll Widget extension card](docs/screenshots/extension-card.svg)
-
-- Live Poll Widget extension card (marketplace, required).
-- Live Poll fields in Layout Builder (admin, optional).
-- Live Poll public output (frontend, optional).
+- Live Poll widget.
 
 ## Technical Shape
 
@@ -98,8 +94,6 @@ Screenshot contract: `docs/screenshots.json`.
 
 - [Package docs](docs/README.md)
 - [Overview](docs/overview.md)
-- [Screenshot contract](docs/screenshots.json)
-- [Marketplace assets](docs/assets/marketplace/)
 - [Capell content language plan](../../docs/CONTENT_LANGUAGE_PLAN.md)
 - [Capell documentation design system](../../docs/DESIGN_SYSTEM.md)
 - [Capell and package ERD notes](../../docs/erd/capell-and-package-erds.md)
