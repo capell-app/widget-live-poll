@@ -1,0 +1,39 @@
+{
+    "whatThisPluginAdds": {
+        "text": "Live Poll adds persisted polls, options, votes, public voting endpoints, and voter-retention cleanup to a Layout Builder widget. Result visibility and repeat-vote behavior are enforced by the poll domain Actions.",
+        "evidence": [
+            "src/Actions/CastPollVoteAction.php",
+            "src/Actions/SyncPublishedPollAction.php",
+            "src/Actions/PruneClosedPollVotersAction.php",
+            "tests/Feature/LivePollTest.php"
+        ]
+    },
+    "surfaceOutcome": {
+        "text": "Editors configure locale-specific polls in Layout Builder, and visitors can vote and see results only when the configured visibility policy permits it.",
+        "evidence": [
+            "src/Providers/WidgetLivePollServiceProvider.php",
+            "src/Actions/ResolveLivePollPayloadsAction.php",
+            "resources/views/widget.blade.php",
+            "tests/Feature/LivePollTest.php"
+        ]
+    },
+    "whyItMatters": {
+        "developers": {
+            "text": "Voting, publication sync, payload resolution, rate controls, and retention are separated into Actions and provider configuration with feature coverage.",
+            "evidence": [
+                "src/Providers/WidgetLivePollServiceProvider.php",
+                "src/Actions/CastPollVoteAction.php",
+                "src/Actions/ResolveLivePollPayloadsAction.php",
+                "tests/Feature/LivePollTest.php"
+            ]
+        },
+        "teams": {
+            "text": "Teams can collect a bounded audience response on the page while controlling when aggregate results become public.",
+            "evidence": [
+                "resources/views/widget.blade.php",
+                "src/Actions/CastPollVoteAction.php",
+                "tests/Feature/LivePollTest.php"
+            ]
+        }
+    }
+}
