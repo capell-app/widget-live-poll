@@ -117,7 +117,7 @@
         "adminQueryBudget": 3,
         "cacheTags": ["widget-live-poll"],
         "cacheSafety": {
-            "cacheable": true,
+            "cacheable": false,
             "variesBy": ["site", "locale", "theme"],
             "sensitiveOutput": false,
             "invalidationSources": [
