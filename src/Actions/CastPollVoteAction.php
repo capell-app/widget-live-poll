@@ -11,11 +11,13 @@ use Capell\WidgetLivePoll\Models\PollOption;
 use Capell\WidgetLivePoll\Models\PollVote;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 use RuntimeException;
 
 final class CastPollVoteAction
 {
+    use AsFake;
     use AsObject;
 
     public function handle(Poll $poll, string $optionId, string $voterCookie): PollVoteResultData

@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Capell\WidgetLivePoll\Actions;
 
 use Capell\WidgetLivePoll\Models\PollVote;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 final class PruneClosedPollVotersAction
 {
+    use AsFake;
     use AsObject;
 
     public function handle(): int

@@ -28,7 +28,7 @@ final readonly class PollVoteController
         abort_unless(is_string($cookie) && $cookie !== '', 403);
 
         try {
-            $result = $this->votes->handle($poll, $optionId, $cookie);
+            $result = CastPollVoteAction::run($poll, $optionId, $cookie);
         } catch (RuntimeException) {
             return response()->json(['message' => 'vote_unavailable'], 422)->header('Cache-Control', 'private, no-store');
         }

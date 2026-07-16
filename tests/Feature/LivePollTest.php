@@ -57,31 +57,31 @@ it('syncs stable options and archives voted removals', function (): void {
     $first = (string) Str::uuid();
     $second = (string) Str::uuid();
     $data = livePollPublication([['id' => $first, 'label' => 'One'], ['id' => $second, 'label' => 'Two']]);
-    $poll = resolve(SyncPublishedPollAction::class)->handle($data);
+    $poll = SyncPublishedPollAction::run($data);
     $option = $poll->options()->where('stable_id', $first)->firstOrFail();
     $option->update(['votes_count' => 1]);
     $updated = new PollPublicationData(siteId: $data->siteId, pageableType: $data->pageableType, pageableId: $data->pageableId, languageId: $data->languageId, widgetInstanceId: $data->widgetInstanceId, question: 'Updated', options: new DataCollection(PollOptionInputData::class, [['id' => $second, 'label' => 'Second']]));
-    resolve(SyncPublishedPollAction::class)->handle($updated);
+    SyncPublishedPollAction::run($updated);
     expect(PollOption::query()->where('stable_id', $first)->first()?->archived_at)->not->toBeNull()->and(PollOption::query()->where('stable_id', $second)->first()?->label)->toBe('Second');
 });
 it('counts a browser once with an atomic durable counter', function (): void {
     $optionId = (string) Str::uuid();
-    $poll = resolve(SyncPublishedPollAction::class)->handle(livePollPublication([['id' => $optionId, 'label' => 'One'], ['id' => (string) Str::uuid(), 'label' => 'Two']]));
-    $first = resolve(CastPollVoteAction::class)->handle($poll, $optionId, 'browser-secret');
-    $duplicate = resolve(CastPollVoteAction::class)->handle($poll, $optionId, 'browser-secret');
+    $poll = SyncPublishedPollAction::run(livePollPublication([['id' => $optionId, 'label' => 'One'], ['id' => (string) Str::uuid(), 'label' => 'Two']]));
+    $first = CastPollVoteAction::run($poll, $optionId, 'browser-secret');
+    $duplicate = CastPollVoteAction::run($poll, $optionId, 'browser-secret');
     expect($first->accepted)->toBeTrue()->and($duplicate->accepted)->toBeFalse()->and(PollVote::query()->count())->toBe(1)->and(PollOption::query()->where('stable_id', $optionId)->value('votes_count'))->toBe(1);
 });
 
 it('rechecks mutable poll state inside the vote transaction', function (): void {
     $optionId = (string) Str::uuid();
-    $poll = resolve(SyncPublishedPollAction::class)->handle(livePollPublication([
+    $poll = SyncPublishedPollAction::run(livePollPublication([
         ['id' => $optionId, 'label' => 'One'],
         ['id' => (string) Str::uuid(), 'label' => 'Two'],
     ]));
 
     $poll->newQuery()->whereKey($poll->getKey())->update(['closes_at' => now()->subSecond()]);
 
-    expect(fn () => resolve(CastPollVoteAction::class)->handle($poll, $optionId, 'late-browser'))
+    expect(fn () => CastPollVoteAction::run($poll, $optionId, 'late-browser'))
         ->toThrow(RuntimeException::class, 'Poll is not open.')
         ->and(PollVote::query()->count())->toBe(0)
         ->and(PollOption::query()->where('stable_id', $optionId)->value('votes_count'))->toBe(0);
@@ -95,9 +95,9 @@ it('applies each results visibility policy without leaking after-close totals to
     ]);
     $publication->resultsVisibility = 'after_close';
     $publication->closesAt = now()->addHour()->toAtomString();
-    $poll = resolve(SyncPublishedPollAction::class)->handle($publication);
+    $poll = SyncPublishedPollAction::run($publication);
 
-    $vote = resolve(CastPollVoteAction::class)->handle($poll, $optionId, 'browser-secret');
+    $vote = CastPollVoteAction::run($poll, $optionId, 'browser-secret');
 
     expect($vote->accepted)->toBeTrue()
         ->and($vote->results)->toBeNull()
@@ -122,7 +122,7 @@ it('removes private totals from shared render payloads', function (): void {
         ['id' => $optionId, 'label' => 'One'],
         ['id' => (string) Str::uuid(), 'label' => 'Two'],
     ]);
-    $poll = resolve(SyncPublishedPollAction::class)->handle($publication);
+    $poll = SyncPublishedPollAction::run($publication);
     $poll->options()->where('stable_id', $optionId)->increment('votes_count', 9);
     $input = new LivePollInputData($publication->question, $publication->options, resultsVisibility: 'after_vote');
     $batch = new WidgetExtensionPayloadBatchData(
@@ -147,11 +147,11 @@ it('prunes voter hashes after closure without deleting aggregate counts', functi
     $optionId = (string) Str::uuid();
     $data = livePollPublication([['id' => $optionId, 'label' => 'One'], ['id' => (string) Str::uuid(), 'label' => 'Two']]);
     $data->closesAt = now()->subDays(91)->toAtomString();
-    $poll = resolve(SyncPublishedPollAction::class)->handle($data);
+    $poll = SyncPublishedPollAction::run($data);
     $option = $poll->options()->firstOrFail();
     PollVote::query()->create(['poll_id' => $poll->getKey(), 'poll_option_id' => $option->getKey(), 'voter_hash' => str_repeat('a', 64), 'created_at' => now()->subDays(91)]);
     $option->increment('votes_count');
-    expect(resolve(PruneClosedPollVotersAction::class)->handle())->toBe(1)->and(PollVote::query()->count())->toBe(0)->and($option->fresh()?->votes_count)->toBe(1);
+    expect(PruneClosedPollVotersAction::run())->toBe(1)->and(PollVote::query()->count())->toBe(0)->and($option->fresh()?->votes_count)->toBe(1);
 });
 
 it('reports definition authoring view assets tables routes and pruning as healthy', function (): void {
@@ -224,7 +224,7 @@ it('bootstraps a host-only voter cookie and keeps results private until they are
             ['id' => (string) Str::uuid(), 'label' => 'Two'],
         ]),
     );
-    $poll = resolve(SyncPublishedPollAction::class)->handle($publication);
+    $poll = SyncPublishedPollAction::run($publication);
     $reference = resolve(PollReferenceCodec::class)->encode($poll);
 
     $bootstrap = getJson('http://poll.test/_capell/widget-polls/' . $reference . '/bootstrap')
@@ -284,7 +284,7 @@ it('bootstraps a host-only voter cookie and keeps results private until they are
         ->assertNotFound();
     getJson('http://poll.test/_capell/widget-polls/not-a-reference/results')
         ->assertNotFound();
-    $otherPoll = resolve(SyncPublishedPollAction::class)->handle(new PollPublicationData(
+    $otherPoll = SyncPublishedPollAction::run(new PollPublicationData(
         siteId: $site->id,
         pageableType: 'page',
         pageableId: 21,
@@ -318,7 +318,7 @@ it('shows after-close results only after the poll closes', function (): void {
         'status' => true,
     ]);
     $optionId = (string) Str::uuid();
-    $poll = resolve(SyncPublishedPollAction::class)->handle(new PollPublicationData(
+    $poll = SyncPublishedPollAction::run(new PollPublicationData(
         siteId: $site->id,
         pageableType: 'page',
         pageableId: 30,

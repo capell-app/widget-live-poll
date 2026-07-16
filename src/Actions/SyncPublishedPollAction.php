@@ -7,10 +7,12 @@ namespace Capell\WidgetLivePoll\Actions;
 use Capell\WidgetLivePoll\Data\PollPublicationData;
 use Capell\WidgetLivePoll\Models\Poll;
 use Illuminate\Support\Facades\DB;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 final class SyncPublishedPollAction
 {
+    use AsFake;
     use AsObject;
 
     public function handle(PollPublicationData $data): Poll

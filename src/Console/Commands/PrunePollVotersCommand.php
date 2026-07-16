@@ -15,7 +15,7 @@ final class PrunePollVotersCommand extends Command
 
     public function handle(): int
     {
-        $count = resolve(PruneClosedPollVotersAction::class)->handle();
+        $count = PruneClosedPollVotersAction::run();
         $this->components->info(sprintf('Pruned %d poll voter hashes.', $count));
 
         return self::SUCCESS;

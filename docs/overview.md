@@ -4,20 +4,28 @@
 
 ## What it does
 
-Live Poll lets editors publish locale-specific single-choice questions with stable options and live aggregate results. Vote insertion and counters update together so duplicate races remain idempotent.
+Live Poll adds a locale-specific, single-choice question to a Layout Builder page. It keeps each option's stable identity when the page is updated, records aggregate counts, and accepts one vote per browser identity for each poll.
 
 ## Do I need to do anything?
 
-Add the widget to a page in Layout Builder, complete its fields, and preview the public page before publishing.
+Add **Live Poll** in Layout Builder, enter a question, and add between two and ten options. Optionally set when voting opens and closes, then choose when totals are shown:
+
+- **Always show results**
+- **Show after voting** (the default)
+- **Show after the poll closes**
+
+Save the page in the relevant site and language. Saving creates or updates the published poll; removing the widget from that page/language deactivates its poll.
 
 ## Where it shows up
 
-In Layout Builder, as a Live Poll widget. Public visitors explicitly start the session, vote once per poll identity, and see aggregate results.
+Editors configure it as a Layout Builder widget. On the public page, visitors can choose one option while the poll is open. They see totals only under the visibility policy you selected.
 
 ## Good to know
 
 - This free beta extension belongs to Capell Foundation and requires Layout Builder.
-- Voter identity is an HMAC rather than a stored cookie value or IP address; vote responses are private and aggregate results use a short public cache.
+- The browser receives an HTTP-only, host-only voter cookie; the database stores an HMAC derived from it, not the cookie value or an IP address.
+- Vote and results responses are private and `no-store`. Voter hashes are pruned 90 days after a poll closes while aggregate option counts remain.
+- Removing an option that already has votes archives it rather than deleting the recorded count.
 
 ## Screenshot status
 
