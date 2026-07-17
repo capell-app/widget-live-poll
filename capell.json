@@ -66,34 +66,28 @@
     "permissions": [],
     "capabilities": ["frontend.interactive"],
     "security": {
-        "riskTier": "high",
+        "riskTier": "standard",
         "publicSurface": {
             "routeNames": [
                 "capell.widget-live-poll.bootstrap",
-                "capell.widget-live-poll.vote",
-                "capell.widget-live-poll.results"
+                "capell.widget-live-poll.results",
+                "capell.widget-live-poll.vote"
             ],
-            "auth": "session-bootstrap",
+            "auth": "public",
             "csrfExemptRoutes": [],
             "signedRoutes": [],
-            "tokenizedRoutes": [
-                "capell.widget-live-poll.bootstrap",
-                "capell.widget-live-poll.vote",
-                "capell.widget-live-poll.results"
-            ],
+            "tokenizedRoutes": [],
             "webhookRoutes": [],
             "throttledRoutes": [
                 "capell.widget-live-poll.bootstrap",
-                "capell.widget-live-poll.vote",
-                "capell.widget-live-poll.results"
+                "capell.widget-live-poll.results",
+                "capell.widget-live-poll.vote"
             ]
         },
         "sensitiveData": {
             "encryptedFields": [],
             "hashedTokenFields": ["capell_poll_votes.voter_hash"],
-            "redactedOutputClasses": [
-                "Capell\\WidgetLivePoll\\Data\\PollVoteResultData"
-            ],
+            "redactedOutputClasses": [],
             "plaintextJustifications": []
         },
         "publicOutput": {

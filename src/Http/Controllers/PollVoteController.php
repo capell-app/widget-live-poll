@@ -13,7 +13,7 @@ use RuntimeException;
 
 final readonly class PollVoteController
 {
-    public function __construct(private PollReferenceCodec $references, private CastPollVoteAction $votes) {}
+    public function __construct(private PollReferenceCodec $references) {}
 
     public function __invoke(Request $request, string $reference): JsonResponse
     {

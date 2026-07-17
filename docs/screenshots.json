@@ -36,9 +36,7 @@
             "useCase": "An editor can see the fields used to configure the Live Poll widget.",
             "url": "/screenshot-fixtures/widgets/live-poll/editor",
             "waitFor": "[data-widget-screenshot-fixture=\"editor\"]",
-            "colorSchemes": [
-                "light"
-            ],
+            "colorSchemes": ["light"],
             "screenshotPath": "packages/widget-live-poll/docs/screenshots/live-poll-layout-builder-editor.png"
         },
         {
@@ -53,9 +51,7 @@
             "useCase": "A visitor casts one privacy-safe vote and immediately sees aggregate results.",
             "url": "/screenshot-fixtures/widgets/live-poll/public",
             "waitFor": "[data-widget-screenshot-fixture=\"public\"]",
-            "colorSchemes": [
-                "light"
-            ],
+            "colorSchemes": ["light"],
             "screenshotPath": "packages/widget-live-poll/docs/screenshots/live-poll-public-output.png"
         }
     ]
