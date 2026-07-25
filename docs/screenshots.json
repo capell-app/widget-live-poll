@@ -13,6 +13,7 @@
     "entries": [
         {
             "id": "widget-live-poll-extension-card",
+            "colorSchemes": ["light"],
             "title": "Live Poll Widget extension card.",
             "package": "widget-live-poll",
             "surface": "marketplace",
@@ -41,18 +42,18 @@
         },
         {
             "id": "live-poll-public-output",
-            "title": "Live Poll public output.",
+            "title": "Illustrative live poll public output preview.",
             "package": "widget-live-poll",
             "surface": "frontend",
-            "targetType": "artifact",
-            "target": "Seeded public page fixture",
-            "required": false,
-            "notes": "Capture the poll fields and a public voted state with the selected option and aggregate result bars visible. Verify the rendered HTML contains no authoring controls, field paths, model identifiers, or signed admin URLs.",
+            "targetType": "frontend-url",
+            "target": "/screenshot-fixtures/catalogue/widget-live-poll/live-poll-public-output",
+            "required": true,
+            "notes": "Illustrative deterministic catalogue fixture, not a live package UI capture. Capture the poll fields and a public voted state with the selected option and aggregate result bars visible. Verify the rendered HTML contains no authoring controls, field paths, model identifiers, or signed admin URLs.",
             "useCase": "A visitor casts one privacy-safe vote and immediately sees aggregate results.",
-            "url": "/screenshot-fixtures/widgets/live-poll/public",
-            "waitFor": "[data-widget-screenshot-fixture=\"public\"]",
-            "colorSchemes": ["light"],
-            "screenshotPath": "packages/widget-live-poll/docs/screenshots/live-poll-public-output.png"
+            "url": "/screenshot-fixtures/catalogue/widget-live-poll/live-poll-public-output",
+            "colorSchemes": ["light", "dark"],
+            "screenshotPath": "packages/widget-live-poll/docs/screenshots/live-poll-public-output.png",
+            "fixtureKind": "illustrative-catalogue"
         }
     ]
 }
