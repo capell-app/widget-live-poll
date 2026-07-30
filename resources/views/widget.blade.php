@@ -1,4 +1,4 @@
-@php /** @var \Capell\WidgetLivePoll\Data\LivePollRenderData $renderData */ $liveOrigin=config('capell-widget-live-poll.live_origin'); @endphp
+@php /** @var \Capell\WidgetLivePoll\Data\LivePollRenderData $renderData */ $liveOrigin = config('capell-widget-live-poll.live_origin'); @endphp
 <section
     class="capell-live-poll"
     data-capell-live-poll
@@ -9,7 +9,7 @@
     @if ($renderData->available) data-bootstrap-url="{{ $renderData->bootstrapUrl }}" data-vote-url="{{ $renderData->voteUrl }}" data-results-url="{{ $renderData->resultsUrl }}" @endif
 >
     <h2>{{ $renderData->question }}</h2>
-    @if ($renderData->available&&$renderData->open)
+    @if ($renderData->available && $renderData->open)
         <form data-poll-form>
             <fieldset>
                 <legend class="capell-live-poll__legend">
@@ -31,7 +31,9 @@
             </button>
         </form>
     @else
-        <p>{{ $renderData->available?__('capell-widget-live-poll::widget.closed'):__('capell-widget-live-poll::widget.unavailable') }}</p>
+        <p>
+            {{ $renderData->available?__('capell-widget-live-poll::widget.closed'):__('capell-widget-live-poll::widget.unavailable') }}
+        </p>
     @endif
     <div
         class="capell-live-poll__results"
@@ -52,7 +54,7 @@
     </div>
     <p role="status" aria-live="polite" data-poll-status></p>
     <noscript>
-        @if (is_string($liveOrigin)&&$liveOrigin!=='')
+        @if (is_string($liveOrigin) && $liveOrigin !== '')
             <a
                 href="{{ $liveOrigin }}"
                 >{{ __('capell-widget-live-poll::widget.live_site') }}</a
