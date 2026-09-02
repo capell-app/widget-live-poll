@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Capell\WidgetLivePoll\Models;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Override;
 
 /**
  * @property int $id
@@ -21,9 +24,26 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 final class Poll extends Model
 {
+    /** @use HasFactory<Factory<static>> */
+    use HasFactory;
+
     protected $table = 'capell_polls';
 
-    protected $guarded = [];
+    /**
+     * @var list<string>
+     */
+    protected $fillable = [
+        'site_id',
+        'pageable_type',
+        'pageable_id',
+        'language_id',
+        'widget_instance_id',
+        'question',
+        'opens_at',
+        'closes_at',
+        'results_visibility',
+        'is_active',
+    ];
 
     /** @return HasMany<PollOption, $this> */
     public function options(): HasMany
@@ -51,6 +71,7 @@ final class Poll extends Model
         return $this->closes_at !== null && $this->closes_at->lte($now);
     }
 
+    #[Override]
     protected function casts(): array
     {
         return ['opens_at' => 'immutable_datetime', 'closes_at' => 'immutable_datetime', 'is_active' => 'boolean'];
