@@ -36,7 +36,7 @@
             "notes": "Capture the real page editor for the dedicated seeded widget page. Open its content builder and expand the configured widget fields; a generic page form is not acceptance. The sidebar variant must also show the open admin sidebar.",
             "useCase": "An editor can see the fields used to configure the Live Poll widget.",
             "url": "/screenshot-fixtures/widgets/live-poll/editor",
-            "waitFor": ".fi-fo-builder",
+            "waitFor": ".fi-fo-builder-item:not(.fi-collapsed) .fi-fo-builder-item-content",
             "colorSchemes": ["light"],
             "screenshotPath": "packages/widget-live-poll/docs/screenshots/live-poll-layout-builder-editor.png",
             "user": "admin",
@@ -44,7 +44,22 @@
                 "width": 1440,
                 "height": 900
             },
-            "viewport": "desktop"
+            "viewport": "desktop",
+            "beforeWait": [
+                {
+                    "type": "click",
+                    "selector": ".fi-fo-builder-item:first-child.fi-collapsed .fi-fo-builder-item-header-expand-action button, .fi-fo-builder-item:first-child:not(.fi-collapsed) .fi-fo-builder-item-content input[type=\"text\"]"
+                },
+                {
+                    "type": "waitFor",
+                    "selector": ".fi-fo-builder-item:not(.fi-collapsed) .fi-fo-builder-item-content"
+                },
+                {
+                    "type": "scrollIntoView",
+                    "selector": ".fi-fo-builder-item:not(.fi-collapsed)",
+                    "block": "start"
+                }
+            ]
         },
         {
             "id": "live-poll-public-output",
@@ -65,7 +80,14 @@
                 "width": 1440,
                 "height": 900
             },
-            "viewport": "desktop"
+            "viewport": "desktop",
+            "beforeWait": [
+                {
+                    "type": "scrollIntoView",
+                    "selector": ".capell-live-poll",
+                    "block": "start"
+                }
+            ]
         },
         {
             "id": "widget-live-poll-admin-sidebar-menu-open",
@@ -78,13 +100,30 @@
             "notes": "Capture the real page editor for the dedicated seeded widget page. Open its content builder and expand the configured widget fields; a generic page form is not acceptance. The sidebar variant must also show the open admin sidebar.",
             "useCase": "An editor can see the fields used to configure the Live Poll widget.",
             "url": "/screenshot-fixtures/widgets/live-poll/editor",
-            "waitFor": ".fi-fo-builder",
+            "waitFor": ".fi-fo-builder-item:not(.fi-collapsed) .fi-fo-builder-item-content",
             "colorSchemes": ["light"],
             "screenshotPath": "packages/widget-live-poll/docs/screenshots/widget-live-poll-admin-sidebar-menu-open.png",
             "beforeWait": [
                 {
                     "type": "click",
                     "selector": ".fi-topbar-open-collapse-sidebar-btn"
+                },
+                {
+                    "type": "waitFor",
+                    "selector": ".fi-sidebar.fi-sidebar-open"
+                },
+                {
+                    "type": "click",
+                    "selector": ".fi-fo-builder-item:first-child.fi-collapsed .fi-fo-builder-item-header-expand-action button, .fi-fo-builder-item:first-child:not(.fi-collapsed) .fi-fo-builder-item-content input[type=\"text\"]"
+                },
+                {
+                    "type": "waitFor",
+                    "selector": ".fi-fo-builder-item:not(.fi-collapsed) .fi-fo-builder-item-content"
+                },
+                {
+                    "type": "scrollIntoView",
+                    "selector": ".fi-fo-builder-item:not(.fi-collapsed)",
+                    "block": "start"
                 }
             ],
             "user": "admin",
@@ -94,5 +133,6 @@
             },
             "viewport": "desktop"
         }
-    ]
+    ],
+    "fixtureCommands": ["capell:prepare-widget-screenshots"]
 }

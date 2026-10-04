@@ -10,8 +10,6 @@ Live Poll adds persisted polls, options, votes, public voting endpoints, and vot
 
 Editors configure locale-specific polls in Layout Builder, and visitors can vote and see results only when the configured visibility policy permits it.
 
-Evidence: [`src/Actions/CastPollVoteAction.php`](src/Actions/CastPollVoteAction.php), [`src/Actions/SyncPublishedPollAction.php`](src/Actions/SyncPublishedPollAction.php), [`src/Actions/PruneClosedPollVotersAction.php`](src/Actions/PruneClosedPollVotersAction.php), [`tests/Feature/LivePollTest.php`](tests/Feature/LivePollTest.php), [`src/Providers/WidgetLivePollServiceProvider.php`](src/Providers/WidgetLivePollServiceProvider.php), [`src/Actions/ResolveLivePollPayloadsAction.php`](src/Actions/ResolveLivePollPayloadsAction.php), [`resources/views/widget.blade.php`](resources/views/widget.blade.php).
-
 Status details:
 
 - Status: Available
@@ -27,19 +25,17 @@ Status details:
 
 **For teams:** Teams can collect a bounded audience response on the page while controlling when aggregate results become public.
 
-Evidence: [`src/Providers/WidgetLivePollServiceProvider.php`](src/Providers/WidgetLivePollServiceProvider.php), [`src/Actions/CastPollVoteAction.php`](src/Actions/CastPollVoteAction.php), [`src/Actions/ResolveLivePollPayloadsAction.php`](src/Actions/ResolveLivePollPayloadsAction.php), [`tests/Feature/LivePollTest.php`](tests/Feature/LivePollTest.php), [`resources/views/widget.blade.php`](resources/views/widget.blade.php).
-
 ## Screens And Workflow
 
 Screenshot contract: `docs/screenshots.json`.
 
 ![Live Poll Widget extension card](docs/screenshots/extension-card.svg)
 
-![Illustrative live poll public output preview](docs/screenshots/live-poll-public-output.png)
+![Live Poll public output](docs/screenshots/live-poll-public-output.png)
 
 - Live Poll Widget extension card (marketplace, required evidence).
 - Live Poll fields in Layout Builder (admin, supplementary evidence).
-- Illustrative live poll public output preview (frontend, required evidence).
+- Live Poll public output (frontend, required evidence).
 - Live Poll fields in Layout Builder with admin sidebar menu open (admin, supplementary evidence).
 
 ## Technical Shape
@@ -164,7 +160,7 @@ Screenshot contract: `docs/screenshots.json`.
 ## Quick Start
 
 1. Install the package: `composer require capell-app/widget-live-poll`.
-2. Open `/screenshot-fixtures/catalogue/widget-live-poll/live-poll-public-output` and confirm the public output renders without admin state.
+2. Open the package detail or install-intent surface and confirm the Live Poll Widget extension card is present.
 
 ## Next Steps
 
@@ -178,6 +174,5 @@ Screenshot contract: `docs/screenshots.json`.
 - [Capell documentation design system](../../docs/DESIGN_SYSTEM.md)
 - [Capell and package ERD notes](../../docs/erd/capell-and-package-erds.md)
 - Related packages: [Layout Builder](../layout-builder/README.md).
-- Focused tests: `vendor/bin/pest packages/widget-live-poll/tests --configuration=phpunit.xml`.
 
 <!-- prettier-ignore-end -->

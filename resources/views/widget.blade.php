@@ -1,7 +1,7 @@
 @php /** @var \Capell\WidgetLivePoll\Data\LivePollRenderData $renderData */ $liveOrigin = config('capell-widget-live-poll.live_origin'); @endphp
 <section
     class="capell-live-poll"
-    data-capell-live-poll
+    data-capell-widget-live-poll
     data-message-duplicate="{{ __('capell-widget-live-poll::widget.duplicate') }}"
     data-message-error="{{ __('capell-widget-live-poll::widget.error') }}"
     data-message-counted="{{ __('capell-widget-live-poll::widget.counted') }}"

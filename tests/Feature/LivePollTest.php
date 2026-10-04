@@ -4,6 +4,8 @@ declare(strict_types=1);
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
+use Capell\Frontend\Actions\AssertPublicHtmlContainsNoAuthoringSurfaceAction;
+use Capell\Frontend\Support\Security\PublicHtmlSafetyInspector;
 use Capell\LayoutBuilder\Data\WidgetExtensions\WidgetExtensionPayloadBatchData;
 use Capell\LayoutBuilder\Data\WidgetExtensions\WidgetExtensionPayloadInputData;
 use Capell\LayoutBuilder\Data\WidgetExtensions\WidgetExtensionRenderContextData;
@@ -16,6 +18,7 @@ use Capell\WidgetLivePoll\Data\LivePollRenderData;
 use Capell\WidgetLivePoll\Data\LivePollRenderOptionData;
 use Capell\WidgetLivePoll\Data\PollOptionInputData;
 use Capell\WidgetLivePoll\Data\PollPublicationData;
+use Capell\WidgetLivePoll\Data\PollVoteResultData;
 use Capell\WidgetLivePoll\Health\WidgetLivePollHealthCheck;
 use Capell\WidgetLivePoll\Models\PollOption;
 use Capell\WidgetLivePoll\Models\PollVote;
@@ -34,6 +37,7 @@ use function Pest\Laravel\withHeader;
 
 use Spatie\LaravelData\DataCollection;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Response;
 
 beforeEach(function (): void {
     $this->app->register(WidgetLivePollServiceProvider::class);
@@ -53,6 +57,7 @@ function livePollPublication(array $options): PollPublicationData
 {
     return new PollPublicationData(siteId: 1, pageableType: 'page', pageableId: 10, languageId: 1, widgetInstanceId: (string) Str::uuid(), question: 'Choose one', options: new DataCollection(PollOptionInputData::class, $options));
 }
+
 it('syncs stable options and archives voted removals', function (): void {
     $first = (string) Str::uuid();
     $second = (string) Str::uuid();
@@ -60,6 +65,7 @@ it('syncs stable options and archives voted removals', function (): void {
     $poll = SyncPublishedPollAction::run($data);
     $option = $poll->options()->where('stable_id', $first)->firstOrFail();
     $option->update(['votes_count' => 1]);
+
     $updated = new PollPublicationData(siteId: $data->siteId, pageableType: $data->pageableType, pageableId: $data->pageableId, languageId: $data->languageId, widgetInstanceId: $data->widgetInstanceId, question: 'Updated', options: new DataCollection(PollOptionInputData::class, [['id' => $second, 'label' => 'Second']]));
     SyncPublishedPollAction::run($updated);
     expect(PollOption::query()->where('stable_id', $first)->first()?->archived_at)->not->toBeNull()->and(PollOption::query()->where('stable_id', $second)->first()?->label)->toBe('Second');
@@ -81,7 +87,7 @@ it('rechecks mutable poll state inside the vote transaction', function (): void 
 
     $poll->newQuery()->whereKey($poll->getKey())->update(['closes_at' => now()->subSecond()]);
 
-    expect(fn () => CastPollVoteAction::run($poll, $optionId, 'late-browser'))
+    expect(fn (): PollVoteResultData => CastPollVoteAction::run($poll, $optionId, 'late-browser'))
         ->toThrow(RuntimeException::class, 'Poll is not open.')
         ->and(PollVote::query()->count())->toBe(0)
         ->and(PollOption::query()->where('stable_id', $optionId)->value('votes_count'))->toBe(0);
@@ -95,6 +101,7 @@ it('applies each results visibility policy without leaking after-close totals to
     ]);
     $publication->resultsVisibility = 'after_close';
     $publication->closesAt = now()->addHour()->toAtomString();
+
     $poll = SyncPublishedPollAction::run($publication);
 
     $vote = CastPollVoteAction::run($poll, $optionId, 'browser-secret');
@@ -105,14 +112,17 @@ it('applies each results visibility policy without leaking after-close totals to
 
     $poll->update(['opens_at' => now()->addHour(), 'closes_at' => now()->addHours(2)]);
     $poll->refresh();
+
     expect(resolve(CastPollVoteAction::class)->resultsForViewer($poll, true))->toBeNull();
 
     $poll->update(['opens_at' => null, 'closes_at' => now()->subSecond()]);
     $poll->refresh();
+
     expect(resolve(CastPollVoteAction::class)->resultsForViewer($poll, false))->toMatchArray([$optionId => 1]);
 
     $poll->update(['results_visibility' => 'invalid']);
     $poll->refresh();
+
     expect(resolve(CastPollVoteAction::class)->resultsForViewer($poll, true))->toBeNull();
 });
 
@@ -147,6 +157,7 @@ it('prunes voter hashes after closure without deleting aggregate counts', functi
     $optionId = (string) Str::uuid();
     $data = livePollPublication([['id' => $optionId, 'label' => 'One'], ['id' => (string) Str::uuid(), 'label' => 'Two']]);
     $data->closesAt = now()->subDays(91)->toAtomString();
+
     $poll = SyncPublishedPollAction::run($data);
     $option = $poll->options()->firstOrFail();
     PollVote::query()->create(['poll_id' => $poll->getKey(), 'poll_option_id' => $option->getKey(), 'voter_hash' => str_repeat('a', 64), 'created_at' => now()->subDays(91)]);
@@ -171,7 +182,20 @@ it('renders an escaped static fallback without stable identities or hidden count
         ]),
     );
 
-    $html = view('capell-widget-live-poll::widget', compact('renderData'))->render();
+    $html = view('capell-widget-live-poll::widget', ['renderData' => $renderData])->render();
+
+    expect($html)->toContain('data-capell-widget-live-poll')
+        ->not->toContain('data-capell-live-poll');
+
+    AssertPublicHtmlContainsNoAuthoringSurfaceAction::run(new Response(
+        '<!doctype html><html><body>' . $html . '</body></html>',
+        Response::HTTP_OK,
+        ['Content-Type' => 'text/html'],
+    ));
+
+    expect(resolve(PublicHtmlSafetyInspector::class)->containsAuthoringSurface(
+        '<section data-capell-live-poll>Widget</section>',
+    ))->toBeTrue();
 
     expect($html)->toContain('&lt;script&gt;Choose&lt;/script&gt;')
         ->toContain('&lt;img src=x&gt;')

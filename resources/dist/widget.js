@@ -74,9 +74,11 @@ const initialisePoll = (root) => {
             })
     })
 }
-document.querySelectorAll('[data-capell-live-poll]').forEach(initialisePoll)
+document
+    .querySelectorAll('[data-capell-widget-live-poll]')
+    .forEach(initialisePoll)
 document.addEventListener('capell:content-ready', (event) =>
     event.target
-        ?.querySelectorAll?.('[data-capell-live-poll]')
+        ?.querySelectorAll?.('[data-capell-widget-live-poll]')
         .forEach(initialisePoll),
 )
