@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('poll_id')->constrained('capell_polls')->cascadeOnDelete();
             $table->foreignId('poll_option_id')->constrained('capell_poll_options')->cascadeOnDelete();
             $table->char('voter_hash', 64);
-            $table->timestamp('created_at');
+            $table->dateTime('created_at');
             $table->unique(['poll_id', 'voter_hash']);
             $table->index(['poll_id', 'created_at']);
         });

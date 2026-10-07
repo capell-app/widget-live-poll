@@ -44,6 +44,16 @@
             "class": "Capell\\WidgetLivePoll\\Manifest\\LivePollPruneScheduleContribution",
             "command": "capell:polls:prune-voters",
             "frequency": "daily"
+        },
+        {
+            "type": "migration",
+            "class": "Capell\\WidgetLivePoll\\Manifest\\WidgetLivePollMigrationsContribution",
+            "migrationFiles": [
+                "2026_07_09_000001_create_capell_polls_table",
+                "2026_07_09_000002_create_capell_poll_options_table",
+                "2026_07_09_000003_create_capell_poll_votes_table",
+                "2026_10_04_000001_remove_implicit_timestamp_updates_from_widget_live_poll"
+            ]
         }
     ],
     "database": {

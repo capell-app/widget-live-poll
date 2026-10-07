@@ -22,6 +22,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
+use Override;
 use Spatie\LaravelPackageTools\Package;
 
 final class WidgetLivePollServiceProvider extends AbstractFoundationWidgetServiceProvider
@@ -30,12 +31,19 @@ final class WidgetLivePollServiceProvider extends AbstractFoundationWidgetServic
 
     public static string $packageName = 'capell-app/widget-live-poll';
 
+    #[Override]
     public function configurePackage(Package $package): void
     {
         parent::configurePackage($package);
-        $package->hasConfigFile('capell-widget-live-poll')->hasMigrations(['2026_07_09_000001_create_capell_polls_table', '2026_07_09_000002_create_capell_poll_options_table', '2026_07_09_000003_create_capell_poll_votes_table'])->hasRoute('web')->hasCommand(PrunePollVotersCommand::class);
+        $package->hasConfigFile('capell-widget-live-poll')->hasMigrations([
+            '2026_07_09_000001_create_capell_polls_table',
+            '2026_07_09_000002_create_capell_poll_options_table',
+            '2026_07_09_000003_create_capell_poll_votes_table',
+            '2026_10_04_000001_remove_implicit_timestamp_updates_from_widget_live_poll',
+        ])->hasRoute('web')->hasCommand(PrunePollVotersCommand::class);
     }
 
+    #[Override]
     public function packageBooted(): void
     {
         parent::packageBooted();
@@ -47,11 +55,13 @@ final class WidgetLivePollServiceProvider extends AbstractFoundationWidgetServic
         });
     }
 
+    #[Override]
     protected static function resourceGroup(): string
     {
         return 'capell-app.widget-live-poll';
     }
 
+    #[Override]
     protected function definition(): WidgetExtensionDefinitionData
     {
         return new WidgetExtensionDefinitionData(key: 'capell-app.live-poll', packageName: self::$packageName, stateVersion: 1, filamentWidget: LivePollWidget::class, inputData: LivePollInputData::class, renderData: LivePollRenderData::class, fallbackView: 'capell-widget-live-poll::widget', components: ['blade' => 'capell::widgets.capell-app.live-poll'], resourceGroups: [self::resourceGroup()], defaultResourceLoadingStrategy: PresentationLoadingStrategy::Visible, capabilities: new WidgetExtensionCapabilitiesData(requiresInstanceIdentity: true, presentationCapabilities: [WidgetPresentationCapability::Width, WidgetPresentationCapability::Alignment, WidgetPresentationCapability::LoadingStrategy]), batchPayloadResolver: ResolveLivePollPayloadsAction::class);
