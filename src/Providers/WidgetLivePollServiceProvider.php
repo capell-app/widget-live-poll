@@ -20,9 +20,11 @@ use Capell\WidgetLivePoll\Listeners\SyncPublishedPollsListener;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Override;
+use ReflectionProperty;
 use Spatie\LaravelPackageTools\Package;
 
 final class WidgetLivePollServiceProvider extends AbstractFoundationWidgetServiceProvider
@@ -40,25 +42,39 @@ final class WidgetLivePollServiceProvider extends AbstractFoundationWidgetServic
             '2026_07_09_000002_create_capell_poll_options_table',
             '2026_07_09_000003_create_capell_poll_votes_table',
             '2026_10_04_000001_remove_implicit_timestamp_updates_from_widget_live_poll',
-        ])->hasRoute('web')->hasCommand(PrunePollVotersCommand::class);
+        ])->hasCommand(PrunePollVotersCommand::class);
     }
 
     #[Override]
-    public function packageBooted(): void
+    public function packageBooted(): void {}
+
+    #[Override]
+    protected static function resourceGroup(): string
     {
-        parent::packageBooted();
+        return 'capell-app.widget-live-poll';
+    }
+
+    #[Override]
+    protected function bootInstalledRuntime(): void
+    {
+        // Poll routes must not inherit a dependent package's active route group.
+        $router = $this->app->make(Router::class);
+        $groups = new ReflectionProperty(Router::class, 'groupStack');
+        $previous = $groups->getValue($router);
+        $groups->setValue($router, []);
+        try {
+            $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
+        } finally {
+            $groups->setValue($router, $previous);
+        }
+
+        $this->registerWidget();
         $this->registerRateLimits();
         Event::listen(PageSaved::class, [SyncPublishedPollsListener::class, 'handleSaved']);
         Event::listen(PageDeleted::class, [SyncPublishedPollsListener::class, 'handleDeleted']);
         $this->callAfterResolving(Schedule::class, static function (Schedule $schedule): void {
             $schedule->command('capell:polls:prune-voters')->daily()->withoutOverlapping();
         });
-    }
-
-    #[Override]
-    protected static function resourceGroup(): string
-    {
-        return 'capell-app.widget-live-poll';
     }
 
     #[Override]

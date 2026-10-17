@@ -1,6 +1,8 @@
 <?php
 
 declare(strict_types=1);
+
+use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
@@ -25,6 +27,7 @@ use Capell\WidgetLivePoll\Models\PollVote;
 use Capell\WidgetLivePoll\Providers\WidgetLivePollServiceProvider;
 use Capell\WidgetLivePoll\Support\PollReferenceCodec;
 use Illuminate\Cookie\CookieValuePrefix;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -40,6 +43,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
 beforeEach(function (): void {
+    CapellCore::forcePackageInstalled('capell-app/widget-live-poll');
     $this->app->register(WidgetLivePollServiceProvider::class);
 
     foreach (glob(__DIR__ . '/../../database/migrations/*.php') ?: [] as $migrationPath) {
@@ -52,6 +56,11 @@ beforeEach(function (): void {
         Route::getRoutes()->refreshNameLookups();
     }
 });
+
+afterEach(function (): void {
+    Carbon::setTestNow();
+});
+
 /** @param list<array{id: string, label: string}> $options */
 function livePollPublication(array $options): PollPublicationData
 {
@@ -79,6 +88,8 @@ it('counts a browser once with an atomic durable counter', function (): void {
 });
 
 it('rechecks mutable poll state inside the vote transaction', function (): void {
+    Carbon::setTestNow(Carbon::now());
+
     $optionId = (string) Str::uuid();
     $poll = SyncPublishedPollAction::run(livePollPublication([
         ['id' => $optionId, 'label' => 'One'],
@@ -94,6 +105,8 @@ it('rechecks mutable poll state inside the vote transaction', function (): void 
 });
 
 it('applies each results visibility policy without leaking after-close totals to voters', function (): void {
+    Carbon::setTestNow(Carbon::now());
+
     $optionId = (string) Str::uuid();
     $publication = livePollPublication([
         ['id' => $optionId, 'label' => 'One'],

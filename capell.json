@@ -54,6 +54,11 @@
                 "2026_07_09_000003_create_capell_poll_votes_table",
                 "2026_10_04_000001_remove_implicit_timestamp_updates_from_widget_live_poll"
             ]
+        },
+        {
+            "type": "asset",
+            "key": "resource-group:capell-app.widget-live-poll",
+            "class": "Capell\\WidgetLivePoll\\WidgetLivePollContribution"
         }
     ],
     "database": {

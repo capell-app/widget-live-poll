@@ -1,6 +1,6 @@
 .capell-live-poll {
     padding: 1.5rem;
-    color: var(--theme-text, #172033);
+    color: var(--theme-foreground, currentColor);
     background: var(--theme-surface, #fff);
     border: 1px solid var(--theme-border, #cbd5e1);
     border-radius: var(--theme-radius, 1rem);
@@ -52,4 +52,16 @@
     .capell-live-poll button {
         border: 2px solid ButtonText;
     }
+}
+
+/* Brand surfaces stay light; Foundation typography switches at the dark root. */
+.dark .capell-live-poll {
+    color: var(--foundation-body-fg, var(--theme-foreground, currentColor));
+    background: var(--foundation-card-bg, var(--theme-surface, #fff));
+    border-color: var(--foundation-border, var(--theme-border, #cbd5e1));
+}
+
+.dark .capell-live-poll button {
+    background: var(--foundation-primary-action, var(--theme-primary, #1d4ed8));
+    color: var(--foundation-page-bg, var(--theme-on-primary, #fff));
 }

@@ -29,11 +29,11 @@ Status details:
 
 Screenshot contract: `docs/screenshots.json`.
 
-![Live Poll Widget extension card](docs/screenshots/extension-card.svg)
-
 ![Live Poll public output](docs/screenshots/live-poll-public-output.png)
 
-- Live Poll Widget extension card (marketplace, required evidence).
+![Live Poll fields in Layout Builder](docs/screenshots/live-poll-layout-builder-editor.png)
+
+- Live Poll Widget extension card (marketplace, supplementary documentation fixture).
 - Live Poll fields in Layout Builder (admin, supplementary evidence).
 - Live Poll public output (frontend, required evidence).
 - Live Poll fields in Layout Builder with admin sidebar menu open (admin, supplementary evidence).
@@ -53,6 +53,7 @@ Screenshot contract: `docs/screenshots.json`.
 - `packages/widget-live-poll/database/migrations/2026_07_09_000001_create_capell_polls_table.php`
 - `packages/widget-live-poll/database/migrations/2026_07_09_000002_create_capell_poll_options_table.php`
 - `packages/widget-live-poll/database/migrations/2026_07_09_000003_create_capell_poll_votes_table.php`
+- `packages/widget-live-poll/database/migrations/2026_10_04_000001_remove_implicit_timestamp_updates_from_widget_live_poll.php`
 
 ### Models
 
@@ -98,7 +99,9 @@ Screenshot contract: `docs/screenshots.json`.
 
 ### Manifest contributions
 
+- `asset: Capell\WidgetLivePoll\WidgetLivePollContribution`
 - `content-widget: Capell\WidgetLivePoll\WidgetLivePollContribution`
+- `migration: Capell\WidgetLivePoll\Manifest\WidgetLivePollMigrationsContribution`
 - `scheduled-job: Capell\WidgetLivePoll\Manifest\LivePollPruneScheduleContribution`
 
 ### Health checks
@@ -119,7 +122,7 @@ Screenshot contract: `docs/screenshots.json`.
 - Required tables: `capell_polls`, `capell_poll_options`, `capell_poll_votes`.
 - Models: `Poll`, `PollOption`, `PollVote`.
 - Core record references in migrations: `sites via site_id`, `languages via language_id`.
-- Migration files: `2026_07_09_000001_create_capell_polls_table.php`, `2026_07_09_000002_create_capell_poll_options_table.php`, `2026_07_09_000003_create_capell_poll_votes_table.php`.
+- Migration files: `2026_07_09_000001_create_capell_polls_table.php`, `2026_07_09_000002_create_capell_poll_options_table.php`, `2026_07_09_000003_create_capell_poll_votes_table.php`, `2026_10_04_000001_remove_implicit_timestamp_updates_from_widget_live_poll.php`.
 - Migration impact: run host migrations through the package install flow before opening package surfaces.
 - Deletion/retention behaviour: migrations declare cascade-on-delete relationships; retention is scheduled through `capell:polls:prune-voters` (daily; registered by the package provider).
 
@@ -160,7 +163,7 @@ Screenshot contract: `docs/screenshots.json`.
 ## Quick Start
 
 1. Install the package: `composer require capell-app/widget-live-poll`.
-2. Open the package detail or install-intent surface and confirm the Live Poll Widget extension card is present.
+2. Open a host admin workflow that uses the package extension and verify Live Poll Widget is available.
 
 ## Next Steps
 
