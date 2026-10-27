@@ -159,11 +159,17 @@ Screenshot contract: `docs/screenshots.json`.
 | Route returns unexpected output | Route cache, middleware, or signed URL setup does not match the package route file | Check the route files listed in `Technical Shape` | Clear route cache and verify middleware before exposing public routes |
 | Background work does not run | Queue worker or declared schedule is not active | Check the jobs and scheduled commands listed in `Technical Shape` | Start the queue worker or host scheduler, then run the focused command or package test |
 | Public output leaks unexpected state | Render data, cache variation, or authoring boundary has regressed | Check public Blade, cache tags, and public-output safety tests | Move data loading out of Blade and rerun the package public-output tests |
+| The poll is refused | It has fewer than 2 or more than 10 options, or the question is over 500 characters | Count the options and check the question length | Keep between 2 and 10 options |
+| The poll will not accept its schedule | The closing time is not after the opening time, or the results setting is not always, after vote or after close | Check the opens and closes times and the results visibility | Set the closing time after the opening time and pick a listed results setting |
 
 ## Quick Start
 
 1. Install the package: `composer require capell-app/widget-live-poll`.
-2. Open a host admin workflow that uses the package extension and verify Live Poll Widget is available.
+2. Open a page, click **Layout builder**, **Add widgets**, then choose **Live Poll**.
+
+## Upgrading
+
+No manual steps between minor versions.
 
 ## Next Steps
 

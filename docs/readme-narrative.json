@@ -35,5 +35,21 @@
                 "tests/Feature/LivePollTest.php"
             ]
         }
-    }
+    },
+    "troubleshooting": [
+        {
+            "symptom": "The poll is refused",
+            "cause": "It has fewer than 2 or more than 10 options, or the question is over 500 characters",
+            "check": "Count the options and check the question length",
+            "fix": "Keep between 2 and 10 options",
+            "evidence": ["src/Data/LivePollInputData.php"]
+        },
+        {
+            "symptom": "The poll will not accept its schedule",
+            "cause": "The closing time is not after the opening time, or the results setting is not always, after vote or after close",
+            "check": "Check the opens and closes times and the results visibility",
+            "fix": "Set the closing time after the opening time and pick a listed results setting",
+            "evidence": ["src/Data/LivePollInputData.php"]
+        }
+    ]
 }
