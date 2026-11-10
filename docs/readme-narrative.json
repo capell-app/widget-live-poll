@@ -1,6 +1,6 @@
 {
     "whatThisPluginAdds": {
-        "text": "Live Poll adds persisted polls, options, votes, public voting endpoints, and voter-retention cleanup to a Layout Builder widget. Result visibility and repeat-vote behavior are enforced by the poll domain Actions.",
+        "text": "Live Poll adds persisted polls, options, votes, public voting endpoints, and voter-retention cleanup to a Layout Builder widget. Result visibility and repeat-vote behaviour are enforced by the poll domain Actions.",
         "evidence": [
             "src/Actions/CastPollVoteAction.php",
             "src/Actions/SyncPublishedPollAction.php",

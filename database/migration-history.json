@@ -1,0 +1,30 @@
+{
+    "create_capell_poll_options_table": {
+        "names": [
+            "2026_07_09_000002_create_capell_poll_options_table"
+        ],
+        "sha256": [
+            "353b66c2c35c230647f0710b28bebc071084805c10f627f17850d8f7ad4f4206",
+            "e502a12753a58a2b0709e568ec31996d5270528db2f017e6855a2c4990debb76"
+        ]
+    },
+    "create_capell_poll_votes_table": {
+        "names": [
+            "2026_07_09_000003_create_capell_poll_votes_table"
+        ],
+        "sha256": [
+            "34642f6b02d72b1f6e60119a18d19d9f652d125d1672262f33fa5aa2bf2158e4",
+            "56991f74f3830bed177a0fac84a6c10565a89d77cb6147f6897e30d5ccbeb44f",
+            "9a9386945434903f62f8f0bd53223c60078803430027d4491ec9450e36c4864e"
+        ]
+    },
+    "create_capell_polls_table": {
+        "names": [
+            "2026_07_09_000001_create_capell_polls_table"
+        ],
+        "sha256": [
+            "1f14f49fa37f01a00a007d0331aabdd82a14908fdedace1f7718dd62a7ffb8c6",
+            "98b7ef95531554df6e812b5c179bfc1c46fbf88af098f17a5f49aa1c6570bf94"
+        ]
+    }
+}

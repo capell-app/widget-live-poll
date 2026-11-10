@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use Capell\Core\Support\TableName;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -9,9 +10,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (Schema::hasTable('capell_polls')) {
+        if (TableName::existsAndIsOwned('capell_polls', basename(__FILE__, '.php'))) {
             return;
-        }Schema::create('capell_polls', function (Blueprint $table): void {
+        }Schema::create(TableName::resolve('capell_polls'), function (Blueprint $table): void {
             $table->id();
             $table->unsignedBigInteger('site_id')->index();
             $table->string('pageable_type');
@@ -24,13 +25,13 @@ return new class extends Migration
             $table->timestamp('closes_at')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            $table->unique(['site_id', 'pageable_type', 'pageable_id', 'language_id', 'widget_instance_id'], 'capell_polls_scope_unique');
+            $table->unique(['site_id', 'pageable_type', 'pageable_id', 'language_id', 'widget_instance_id'], TableName::namedIndex('capell_polls', 'capell_polls_scope_unique'));
             $table->index(['pageable_type', 'pageable_id']);
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('capell_polls');
+        Schema::dropIfExists(TableName::resolve('capell_polls'));
     }
 };

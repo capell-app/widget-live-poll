@@ -8,7 +8,7 @@
     "version": "1.0.0",
     "description": "Locale-specific single-choice polls with stable options, transactional vote counters, privacy-safe voter identity, and aggregate caching.",
     "product": {
-        "group": "Capell Foundation",
+        "group": "Capell Essentials",
         "tier": "free",
         "bundle": "foundation"
     },
@@ -25,7 +25,9 @@
         "conflicts": []
     },
     "providers": {
-        "metadata": [],
+        "metadata": [
+            "Capell\\WidgetLivePoll\\Providers\\MigrationMetadataServiceProvider"
+        ],
         "install": [],
         "runtime": [
             "Capell\\WidgetLivePoll\\Providers\\WidgetLivePollServiceProvider"
@@ -84,9 +86,9 @@
         "riskTier": "standard",
         "publicSurface": {
             "routeNames": [
-                "capell.widget-live-poll.bootstrap",
-                "capell.widget-live-poll.results",
-                "capell.widget-live-poll.vote"
+                "GET /_capell/widget-polls/{reference}/bootstrap (capell.widget-live-poll.bootstrap)",
+                "GET /_capell/widget-polls/{reference}/results (capell.widget-live-poll.results)",
+                "POST /_capell/widget-polls/{reference}/vote (capell.widget-live-poll.vote)"
             ],
             "auth": "public",
             "csrfExemptRoutes": [],
@@ -94,9 +96,9 @@
             "tokenizedRoutes": [],
             "webhookRoutes": [],
             "throttledRoutes": [
-                "capell.widget-live-poll.bootstrap",
-                "capell.widget-live-poll.results",
-                "capell.widget-live-poll.vote"
+                "GET /_capell/widget-polls/{reference}/bootstrap (capell.widget-live-poll.bootstrap)",
+                "GET /_capell/widget-polls/{reference}/results (capell.widget-live-poll.results)",
+                "POST /_capell/widget-polls/{reference}/vote (capell.widget-live-poll.vote)"
             ]
         },
         "sensitiveData": {
@@ -169,7 +171,34 @@
     },
     "marketplace": {
         "summary": "Transactional live polls with privacy-safe one-vote browser identity.",
+        "description": "Add a single-choice question to a page and show the results. Each browser can vote once per poll, and counts are kept as aggregates only. Requires Layout Builder. Limits: two to ten options per poll, and one vote per browser identity (not per person).",
+        "problem": "Site teams collecting opinions need a way to let visitors vote on a page.",
+        "outcome": "A page has a poll with stored votes and configured result visibility.",
+        "faq": [
+            {
+                "question": "Who can see poll results?",
+                "answer": "Visitors can see results only when the configured visibility policy permits it."
+            },
+            {
+                "question": "Are votes retained by the package?",
+                "answer": "Polls, options and votes are persisted, and voter-retention cleanup is provided."
+            },
+            {
+                "question": "Can polls vary by language?",
+                "answer": "Editors configure locale-specific polls in Layout Builder."
+            }
+        ],
         "screenshots": [
+            {
+                "path": "docs/assets/marketplace/listing-live-poll-public-output.png",
+                "alt": "Live Poll public output",
+                "caption": "Live Poll public output"
+            },
+            {
+                "path": "docs/assets/marketplace/listing-live-poll-layout-builder-editor.png",
+                "alt": "Live Poll fields in Layout Builder",
+                "caption": "Live Poll fields in Layout Builder"
+            },
             {
                 "path": "docs/assets/marketplace/extension-card.jpg",
                 "alt": "Live Poll widget preview",
