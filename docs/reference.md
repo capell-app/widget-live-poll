@@ -6,7 +6,7 @@ Developer reference for `capell-app/widget-live-poll`. Start with the [README](.
 
 ## Package Details
 
-Live Poll Widget is an **Available**, **Schema-owning** Capell package in the **Capell Essentials** product group. It ships as `capell-app/widget-live-poll` and extends these surfaces: admin, frontend, console.
+Live Poll Widget is an **Available** Capell package in the **Capell Essentials** product group. It ships as `capell-app/widget-live-poll` and extends these surfaces: admin, frontend, console.
 
 - Status: Available
 - Tier: free
@@ -54,6 +54,7 @@ Live Poll Widget is an **Available**, **Schema-owning** Capell package in the **
 ### Actions
 
 - `CastPollVoteAction`
+- `LimitDailyVotesPerAddressAction`
 - `PruneClosedPollVotersAction`
 - `ResolveLivePollPayloadsAction`
 - `SyncPublishedPollAction`

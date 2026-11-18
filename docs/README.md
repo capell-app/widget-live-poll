@@ -2,14 +2,14 @@
 
 Live Poll Widget is a free Capell Foundation extension for Layout Builder and public page output.
 
-Start at the [package README](../README.md) for the developer boundary, then use the Marketplace overview and screenshot contract below.
+Start at the [package README](../README.md) for the developer boundary, then use the Marketplace overview and screenshots below.
 
 ## Guides
 
 | Doc                                                          | Use it for                                                           |
 | ------------------------------------------------------------ | -------------------------------------------------------------------- |
 | [Overview](overview.md)                                      | Buyer value, visible surfaces, setup expectations, and safety notes. |
-| [Screenshot contract](screenshots.json)                      | The pending editor and public-output fixture captures.               |
+| [Screenshots](screenshots.json)                              | The pending editor and public-output fixture captures.               |
 | [Marketplace artwork](assets/marketplace/extension-card.svg) | Interim beta artwork used until real fixture captures are committed. |
 
 ## Read Next

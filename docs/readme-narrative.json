@@ -1,22 +1,4 @@
 {
-    "whatThisPluginAdds": {
-        "text": "Live Poll adds persisted polls, options, votes, public voting endpoints, and voter-retention cleanup to a Layout Builder widget. Result visibility and repeat-vote behaviour are enforced by the poll domain Actions.",
-        "evidence": [
-            "src/Actions/CastPollVoteAction.php",
-            "src/Actions/SyncPublishedPollAction.php",
-            "src/Actions/PruneClosedPollVotersAction.php",
-            "tests/Feature/LivePollTest.php"
-        ]
-    },
-    "surfaceOutcome": {
-        "text": "Editors configure locale-specific polls in Layout Builder, and visitors can vote and see results only when the configured visibility policy permits it.",
-        "evidence": [
-            "src/Providers/WidgetLivePollServiceProvider.php",
-            "src/Actions/ResolveLivePollPayloadsAction.php",
-            "resources/views/widget.blade.php",
-            "tests/Feature/LivePollTest.php"
-        ]
-    },
     "whyItMatters": {
         "developers": {
             "text": "Voting, publication sync, payload resolution, rate controls, and retention are separated into Actions and provider configuration with feature coverage.",
@@ -26,30 +8,6 @@
                 "src/Actions/ResolveLivePollPayloadsAction.php",
                 "tests/Feature/LivePollTest.php"
             ]
-        },
-        "teams": {
-            "text": "Teams can collect a bounded audience response on the page while controlling when aggregate results become public.",
-            "evidence": [
-                "resources/views/widget.blade.php",
-                "src/Actions/CastPollVoteAction.php",
-                "tests/Feature/LivePollTest.php"
-            ]
         }
-    },
-    "troubleshooting": [
-        {
-            "symptom": "The poll is refused",
-            "cause": "It has fewer than 2 or more than 10 options, or the question is over 500 characters",
-            "check": "Count the options and check the question length",
-            "fix": "Keep between 2 and 10 options",
-            "evidence": ["src/Data/LivePollInputData.php"]
-        },
-        {
-            "symptom": "The poll will not accept its schedule",
-            "cause": "The closing time is not after the opening time, or the results setting is not always, after vote or after close",
-            "check": "Check the opens and closes times and the results visibility",
-            "fix": "Set the closing time after the opening time and pick a listed results setting",
-            "evidence": ["src/Data/LivePollInputData.php"]
-        }
-    ]
+    }
 }

@@ -18,11 +18,11 @@ Editors configure it as a Layout Builder widget. On the public page, visitors ca
 
 ## Good to know
 
-- This free beta extension belongs to Capell Essentials and requires Layout Builder.
-- The browser receives an HTTP-only, host-only voter cookie; the database stores an HMAC derived from it, not the cookie value or an IP address.
+- This free extension belongs to Capell Essentials and requires Layout Builder.
+- The browser receives an HTTP-only, host-only voter cookie named `capell_poll_voter` that lasts one year; the database stores an HMAC derived from it, not the cookie value or an IP address.
 - Vote and results responses are private and `no-store`. Voter hashes are pruned 90 days after a poll closes while aggregate option counts remain.
 - Removing an option that already has votes archives it rather than deleting the recorded count.
 
 ## Screenshot status
 
-Capture the poll fields and a public voted state with the selected option and aggregate result bars visible. The committed Marketplace card is interim beta artwork until these two fixture captures are recorded.
+Capture the poll fields and a public voted state with the selected option and vote counts visible.

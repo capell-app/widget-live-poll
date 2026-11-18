@@ -4,8 +4,8 @@
     "scenarios": {
         "default": {
             "source": {
-                "ref": "c92ce184be4d91c372f35ca125ea25f6c1308599",
-                "commit": "c92ce184be4d91c372f35ca125ea25f6c1308599",
+                "ref": "92da4146f6",
+                "commit": "92da4146f6865853f68459b45621ebc812302b34",
                 "providers": {
                     "Providers/MigrationMetadataServiceProvider.php": "dc621e517b154dd86ba8c7a94622babe2fcf76033f41f9ea7f7a45c8436c9410",
                     "Providers/WidgetLivePollServiceProvider.php": "3512b89355b583677c77fdc233e8143ecc7e8fa64496ede6f47433ab752c3de1"
@@ -22,11 +22,13 @@
                 },
                 "config-defaults": {
                     "capell-widget-live-poll.php": {
+                        "daily_votes_per_address": 25,
                         "live_origin": null
                     }
                 },
                 "config-keys": [
                     "capell-widget-live-poll",
+                    "capell-widget-live-poll.daily_votes_per_address",
                     "capell-widget-live-poll.live_origin"
                 ],
                 "config-values": {
@@ -375,11 +377,13 @@
                 },
                 "config-defaults": {
                     "capell-widget-live-poll.php": {
+                        "daily_votes_per_address": 25,
                         "live_origin": null
                     }
                 },
                 "config-keys": [
                     "capell-widget-live-poll",
+                    "capell-widget-live-poll.daily_votes_per_address",
                     "capell-widget-live-poll.live_origin"
                 ],
                 "config-values": {

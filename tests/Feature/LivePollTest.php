@@ -12,6 +12,7 @@ use Capell\LayoutBuilder\Data\WidgetExtensions\WidgetExtensionPayloadBatchData;
 use Capell\LayoutBuilder\Data\WidgetExtensions\WidgetExtensionPayloadInputData;
 use Capell\LayoutBuilder\Data\WidgetExtensions\WidgetExtensionRenderContextData;
 use Capell\WidgetLivePoll\Actions\CastPollVoteAction;
+use Capell\WidgetLivePoll\Actions\LimitDailyVotesPerAddressAction;
 use Capell\WidgetLivePoll\Actions\PruneClosedPollVotersAction;
 use Capell\WidgetLivePoll\Actions\ResolveLivePollPayloadsAction;
 use Capell\WidgetLivePoll\Actions\SyncPublishedPollAction;
@@ -387,4 +388,57 @@ it('shows after-close results only after the poll closes', function (): void {
     getJson('http://poll.test/_capell/widget-polls/' . $reference . '/results')
         ->assertOk()
         ->assertJson(['results' => [$optionId => 0]]);
+});
+
+it('caps accepted votes per address per poll even when the voter cookie is cleared', function (): void {
+    config()->set('capell-widget-live-poll.daily_votes_per_address', 2);
+    $language = Language::factory()->english()->create();
+    $site = Site::factory()->language($language)->create();
+    SiteDomain::factory()->site($site)->language($language)->create(['domain' => 'poll.test', 'scheme' => 'http', 'path' => null, 'status' => true]);
+    $optionId = (string) Str::uuid();
+    $poll = SyncPublishedPollAction::run(new PollPublicationData(
+        siteId: $site->id,
+        pageableType: 'page',
+        pageableId: 20,
+        languageId: $language->id,
+        widgetInstanceId: (string) Str::uuid(),
+        question: 'Choose',
+        options: new DataCollection(PollOptionInputData::class, [['id' => $optionId, 'label' => 'One'], ['id' => (string) Str::uuid(), 'label' => 'Two']]),
+    ));
+    $reference = resolve(PollReferenceCodec::class)->encode($poll);
+
+    $vote = function () use ($reference, $optionId) {
+        // A visitor who clears cookies starts every attempt without one.
+        $this->defaultCookies = [];
+        $bootstrap = getJson('http://poll.test/_capell/widget-polls/' . $reference . '/bootstrap')->assertOk();
+        $cookie = collect($bootstrap->baseResponse->headers->getCookies())->first(static fn (Cookie $candidate): bool => $candidate->getName() === 'capell_poll_voter');
+        throw_unless($cookie instanceof Cookie && is_string($cookie->getValue()) && is_string($bootstrap->json('csrf_token')));
+        withCredentials();
+        withCookie('capell_poll_voter', CookieValuePrefix::remove(Crypt::decryptString($cookie->getValue())));
+        withHeader('X-CSRF-TOKEN', $bootstrap->json('csrf_token'));
+
+        return postJson('http://poll.test/_capell/widget-polls/' . $reference . '/vote', ['option_id' => $optionId]);
+    };
+
+    $vote()->assertOk()->assertJson(['accepted' => true]);
+    $vote()->assertOk()->assertJson(['accepted' => true]);
+    $vote()->assertStatus(429)->assertJson(['message' => 'vote_limit_reached'])->assertHeader('Cache-Control', 'no-store, private');
+
+    expect(PollVote::query()->count())->toBe(2)
+        ->and(PollOption::query()->where('stable_id', $optionId)->value('votes_count'))->toBe(2)
+        ->and(PollVote::query()->pluck('voter_hash')->implode('|'))->not->toContain('127.0.0.1');
+});
+
+it('counts the daily address limit per poll and ignores requests without an address', function (): void {
+    config()->set('capell-widget-live-poll.daily_votes_per_address', 1);
+    $first = SyncPublishedPollAction::run(livePollPublication([['id' => (string) Str::uuid(), 'label' => 'One'], ['id' => (string) Str::uuid(), 'label' => 'Two']]));
+    $second = SyncPublishedPollAction::run(livePollPublication([['id' => (string) Str::uuid(), 'label' => 'One'], ['id' => (string) Str::uuid(), 'label' => 'Two']]));
+    $limits = LimitDailyVotesPerAddressAction::make();
+
+    $limits->record($first, '203.0.113.7');
+
+    expect($limits->handle($first, '203.0.113.7'))->toBeFalse()
+        ->and($limits->handle($first, '203.0.113.8'))->toBeTrue()
+        ->and($limits->handle($second, '203.0.113.7'))->toBeTrue()
+        ->and($limits->handle($first, null))->toBeTrue();
 });

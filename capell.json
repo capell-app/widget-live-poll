@@ -6,7 +6,7 @@
     "kind": "package",
     "capellApiVersion": "^1.0",
     "version": "1.0.0",
-    "description": "Locale-specific single-choice polls with stable options, transactional vote counters, privacy-safe voter identity, and aggregate caching.",
+    "description": "One multiple-choice question on a page, one vote per browser, with totals shown when you choose.",
     "product": {
         "group": "Capell Essentials",
         "tier": "free",
@@ -81,7 +81,7 @@
     },
     "settings": [],
     "permissions": [],
-    "capabilities": ["frontend.interactive"],
+    "capabilities": ["frontend-surface"],
     "security": {
         "riskTier": "standard",
         "publicSurface": {
@@ -170,41 +170,63 @@
         "privateDocsRequested": false
     },
     "marketplace": {
-        "summary": "Transactional live polls with privacy-safe one-vote browser identity.",
-        "description": "Add a single-choice question to a page and show the results. Each browser can vote once per poll, and counts are kept as aggregates only. Requires Layout Builder. Limits: two to ten options per poll, and one vote per browser identity (not per person).",
-        "problem": "Site teams collecting opinions need a way to let visitors vote on a page.",
-        "outcome": "A page has a poll with stored votes and configured result visibility.",
+        "summary": "A poll with one question and up to ten answers, showing vote counts always, after voting or after closing.",
+        "description": "Ask visitors one question with up to ten answers and let them vote with a single press. You decide when totals show up, either from the start, after someone votes, or once the poll closes on a date you pick. Totals are plain counts that refresh when the page loads or a vote comes in. Each browser gets one vote, kept track of with one cookie, and the site stores only a scrambled copy with no internet address. Voter records are deleted ninety days after closing and the totals stay. It needs Layout Builder to place it on a page.",
+        "problem": "Site owners want a quick show of hands without a full form or people voting over and over.",
+        "outcome": "Visitors vote in one click and see plain totals at the moment you chose.",
         "faq": [
             {
-                "question": "Who can see poll results?",
-                "answer": "Visitors can see results only when the configured visibility policy permits it."
+                "question": "Who sees the results?",
+                "answer": "You decide when. Results can show for everyone straight away, only for people who have voted, or only once the poll closes on a date you set."
             },
             {
-                "question": "Are votes retained by the package?",
-                "answer": "Polls, options and votes are persisted, and voter-retention cleanup is provided."
+                "question": "Can someone vote twice?",
+                "answer": "Each browser gets one vote per poll. Someone with a second phone could vote again, so it suits a friendly poll and should not be used as a formal ballot."
             },
             {
-                "question": "Can polls vary by language?",
-                "answer": "Editors configure locale-specific polls in Layout Builder."
+                "question": "Does the poll store personal information?",
+                "answer": "It sets one cookie to remember a visitor's vote, and your site holds just a scrambled version of it with the vote. To cap votes, a scrambled form of the internet address is held for a day, and the address itself is not saved."
+            },
+            {
+                "question": "What happens to voter records after a poll closes?",
+                "answer": "If the poll has a closing date, the records of who voted are removed 90 days after it. The totals are kept."
+            },
+            {
+                "question": "How many answers can a poll have?",
+                "answer": "Up to ten. Results are plain counts for each answer, without percentages or bars."
             }
         ],
         "screenshots": [
             {
                 "path": "docs/assets/marketplace/listing-live-poll-public-output.png",
-                "alt": "Live Poll public output",
-                "caption": "Live Poll public output"
+                "alt": "Poll with three radio options, a Vote button and a Results list that shows zero for each answer",
+                "caption": "Visitors choose one answer and press Vote, with the totals listed underneath."
             },
             {
                 "path": "docs/assets/marketplace/listing-live-poll-layout-builder-editor.png",
-                "alt": "Live Poll fields in Layout Builder",
-                "caption": "Live Poll fields in Layout Builder"
+                "alt": "Page editor with a Live Poll block open, showing the question, three option labels and an Add to options button",
+                "caption": "Write the question, then add each answer as its own option."
             },
             {
                 "path": "docs/assets/marketplace/extension-card.jpg",
-                "alt": "Live Poll widget preview",
-                "caption": "Live Poll widget"
+                "alt": "Marketplace card for the Live Poll widget with a poll page and an editor screen and the steps Install, Use and Evolve",
+                "caption": "Card used for the widget's Marketplace listing."
             }
         ],
         "categories": ["foundation", "frontend", "interactive"]
+    },
+    "contributionTraceability": {
+        "contributions": [
+            {
+                "type": "asset",
+                "key": "resource-group:capell-app.widget-live-poll",
+                "providerBucket": "runtime"
+            },
+            {
+                "type": "content-widget",
+                "key": "capell-app.live-poll",
+                "providerBucket": "runtime"
+            }
+        ]
     }
 }

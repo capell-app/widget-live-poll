@@ -23,7 +23,7 @@
             "path": "docs/assets/marketplace/extension-card.svg",
             "fixtureKind": "illustrative-catalogue",
             "notes": "Committed Beta Marketplace card artwork for Live Poll Widget.",
-            "useCase": "A buyer reviews the Beta extension card before enabling Live Poll Widget."
+            "useCase": "The Live Poll Widget extension card, marked Beta."
         },
         {
             "id": "live-poll-layout-builder-editor",

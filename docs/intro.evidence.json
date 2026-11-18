@@ -1,0 +1,119 @@
+[
+    {
+        "claim": "When a club wants a quick show of hands on its next outing, a poll on the page will do it.",
+        "evidence": [
+            "resources/views/widget.blade.php",
+            "resources/dist/widget.js"
+        ]
+    },
+    {
+        "claim": "Visitors see one question with up to ten answers.",
+        "evidence": [
+            "src/Data/LivePollInputData.php",
+            "src/Data/PollOptionInputData.php",
+            "resources/views/widget.blade.php"
+        ]
+    },
+    {
+        "claim": "They pick one and press Vote.",
+        "evidence": [
+            "src/Data/LivePollInputData.php",
+            "src/Data/PollOptionInputData.php",
+            "resources/views/widget.blade.php"
+        ]
+    },
+    {
+        "claim": "The totals appear when you say.",
+        "evidence": [
+            "resources/views/widget.blade.php",
+            "resources/dist/widget.js"
+        ]
+    },
+    {
+        "claim": "Show them to everyone from the start, only to people who've voted, or only once the poll closes on a date you set.",
+        "evidence": [
+            "src/Actions/PruneClosedPollVotersAction.php",
+            "src/Actions/CastPollVoteAction.php"
+        ]
+    },
+    {
+        "claim": "They're plain counts for each answer, without percentages or bars.",
+        "evidence": [
+            "resources/views/widget.blade.php",
+            "resources/dist/widget.js"
+        ]
+    },
+    {
+        "claim": "They're current when the page loads and refresh when someone votes.",
+        "evidence": [
+            "resources/views/widget.blade.php",
+            "resources/dist/widget.js"
+        ]
+    },
+    {
+        "claim": "Each browser gets one vote per poll.",
+        "evidence": [
+            "src/Actions/CastPollVoteAction.php",
+            "src/Actions/LimitDailyVotesPerAddressAction.php",
+            "config/capell-widget-live-poll.php",
+            "database/migrations/2026_07_09_000003_create_capell_poll_votes_table.php"
+        ]
+    },
+    {
+        "claim": "Pressing Vote twice won't count twice, though someone with a second phone could vote again.",
+        "evidence": [
+            "src/Data/LivePollInputData.php",
+            "src/Data/PollOptionInputData.php",
+            "resources/views/widget.blade.php"
+        ]
+    },
+    {
+        "claim": "Treat it as a friendly poll, not a ballot.",
+        "evidence": [
+            "src/Actions/CastPollVoteAction.php",
+            "src/Actions/LimitDailyVotesPerAddressAction.php",
+            "config/capell-widget-live-poll.php",
+            "database/migrations/2026_07_09_000003_create_capell_poll_votes_table.php"
+        ]
+    },
+    {
+        "claim": "To remember who has voted, the poll sets one cookie in the visitor's browser.",
+        "evidence": [
+            "src/Actions/CastPollVoteAction.php",
+            "src/Actions/LimitDailyVotesPerAddressAction.php",
+            "config/capell-widget-live-poll.php",
+            "database/migrations/2026_07_09_000003_create_capell_poll_votes_table.php"
+        ]
+    },
+    {
+        "claim": "Your site keeps only a scrambled copy of it, and never stores their internet address with the vote, only a one-day scrambled count of votes from it.",
+        "evidence": [
+            "src/Actions/LimitDailyVotesPerAddressAction.php",
+            "src/Actions/CastPollVoteAction.php",
+            "config/capell-widget-live-poll.php"
+        ]
+    },
+    {
+        "claim": "Clearing the cookie doesn't allow unlimited voting, because one internet address can cast 25 votes on a poll in a day.",
+        "evidence": [
+            "src/Actions/CastPollVoteAction.php",
+            "src/Actions/LimitDailyVotesPerAddressAction.php",
+            "config/capell-widget-live-poll.php",
+            "database/migrations/2026_07_09_000003_create_capell_poll_votes_table.php"
+        ]
+    },
+    {
+        "claim": "Once a poll has a closing date, voter records are deleted ninety days after it and the totals stay.",
+        "evidence": [
+            "src/Actions/PruneClosedPollVotersAction.php",
+            "src/Actions/CastPollVoteAction.php"
+        ]
+    },
+    {
+        "claim": "If you chose to show results after closing, everyone sees the final totals from closing time.",
+        "evidence": [
+            "src/Actions/PruneClosedPollVotersAction.php",
+            "src/Actions/CastPollVoteAction.php"
+        ]
+    }
+]

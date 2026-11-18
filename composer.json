@@ -1,6 +1,6 @@
 {
     "name": "capell-app/widget-live-poll",
-    "description": "Transactional privacy-conscious live poll widget for Capell.",
+    "description": "Poll widget for Capell pages with one question, one vote per browser and plain totals shown when you choose. Needs Layout Builder.",
     "type": "library",
     "license": "proprietary",
     "require": {
