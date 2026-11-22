@@ -35,10 +35,6 @@ Editors configure it as a Layout Builder widget. On the public page, visitors ca
 - Vote and results responses are private and `no-store`. Voter hashes are pruned 90 days after a poll closes while aggregate option counts remain.
 - Removing an option that already has votes archives it rather than deleting the recorded count.
 
-## Screenshot status
-
-Capture the poll fields and a public voted state with the selected option and vote counts visible.
-
 ---
 
 For developers: see the [README](../README.md).

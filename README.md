@@ -10,14 +10,14 @@ Each browser gets one vote per poll. Pressing Vote twice won't count twice, thou
 
 To remember who has voted, the poll sets one cookie in the visitor's browser. Your site keeps only a scrambled copy of it, and never stores their internet address with the vote, only a one-day scrambled count of votes from it. Clearing the cookie doesn't allow unlimited voting, because one internet address can cast 25 votes on a poll in a day. Once a poll has a closing date, voter records are deleted ninety days after it and the totals stay. If you chose to show results after closing, everyone sees the final totals from closing time.
 
-- **Price and availability:** Check current availability and price on the [Capell Marketplace listing](https://capell.app/extensions/widget-live-poll).
-- **Licence:** Check the licence terms on the [Capell Marketplace listing](https://capell.app/extensions/widget-live-poll).
-- **Requires:** `PHP ^8.4`, `capell-app/admin ^1.0`, `capell-app/core ^1.0.75`, `capell-app/frontend ^1.0`, `capell-app/layout-builder ^1.0`, `laravel/framework ^12.0 || ^13.0`, `lorisleiva/laravel-actions ^2.8`, `spatie/laravel-package-tools ^1.0`.
-- **Install:** `composer require capell-app/widget-live-poll`.
+- **Price and availability:** Check current availability and price on the [Capell Marketplace listing](https://capell.app/marketplace/extensions/widget-live-poll).
+- **Licence:** Check the licence terms on the [Capell Marketplace listing](https://capell.app/marketplace/extensions/widget-live-poll).
+- **Requires:** `PHP ^8.4`, `capell-app/admin ^1.0`, `capell-app/core ^1.0.79`, `capell-app/frontend ^1.0.79`, `capell-app/layout-builder ^1.0`, `laravel/framework ^12.0 || ^13.0`, `lorisleiva/laravel-actions ^2.8`, `spatie/laravel-package-tools ^1.0`.
+- **Install:** `composer require capell-app/widget-live-poll:@beta`.
 
 ## Quick Start
 
-1. Install the package: `composer require capell-app/widget-live-poll`.
+1. Install the package: `composer require capell-app/widget-live-poll:@beta`.
 2. Open a page, click **Layout builder**, **Add widgets**, then choose **Live Poll**.
 
 ## For Developers
@@ -30,7 +30,7 @@ Voting, publication sync, payload resolution, rate controls, and retention are s
 
 ## Limits And Pitfalls
 
-- Install the required Capell packages at the versions in `composer.json`: `capell-app/admin ^1.0`, `capell-app/core ^1.0.75`, `capell-app/frontend ^1.0`, `capell-app/layout-builder ^1.0`.
+- Install the required Capell packages at the versions in `composer.json`: `capell-app/admin ^1.0`, `capell-app/core ^1.0.79`, `capell-app/frontend ^1.0.79`, `capell-app/layout-builder ^1.0`.
 - Run migrations before opening package resources or public routes.
 - Review middleware, throttling, signatures, and public-output safety in `routes/web.php` before exposing routes.
 - Keep the host Laravel scheduler running so package-registered schedules can execute: `capell:polls:prune-voters (daily; package registered)`.

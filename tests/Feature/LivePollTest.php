@@ -27,8 +27,11 @@ use Capell\WidgetLivePoll\Models\PollOption;
 use Capell\WidgetLivePoll\Models\PollVote;
 use Capell\WidgetLivePoll\Providers\WidgetLivePollServiceProvider;
 use Capell\WidgetLivePoll\Support\PollReferenceCodec;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -442,3 +445,31 @@ it('counts the daily address limit per poll and ignores requests without an addr
         ->and($limits->handle($second, '203.0.113.7'))->toBeTrue()
         ->and($limits->handle($first, null))->toBeTrue();
 });
+
+it('enforces the daily address limit when the cache returns the vote count as a numeric string', function (): void {
+    useLivePollNumericStringCache();
+    config()->set('capell-widget-live-poll.daily_votes_per_address', 1);
+    $poll = SyncPublishedPollAction::run(livePollPublication([['id' => (string) Str::uuid(), 'label' => 'One'], ['id' => (string) Str::uuid(), 'label' => 'Two']]));
+    $limits = LimitDailyVotesPerAddressAction::make();
+
+    $limits->record($poll, '203.0.113.7');
+
+    expect($limits->handle($poll, '203.0.113.7'))->toBeFalse();
+});
+
+/** Makes the default cache return stored numbers as numeric strings, as the Redis store (and Valkey) does. */
+function useLivePollNumericStringCache(): void
+{
+    Cache::extend('live-poll-numeric-strings', fn (): Repository => Cache::repository(new class extends ArrayStore
+    {
+        #[Override]
+        public function get($key): mixed
+        {
+            $value = parent::get($key);
+
+            return is_int($value) || is_float($value) ? (string) $value : $value;
+        }
+    }));
+    config()->set('cache.stores.live-poll-numeric-strings', ['driver' => 'live-poll-numeric-strings']);
+    config()->set('cache.default', 'live-poll-numeric-strings');
+}

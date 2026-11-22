@@ -171,7 +171,7 @@
     },
     "marketplace": {
         "summary": "A poll with one question and up to ten answers, showing vote counts always, after voting or after closing.",
-        "description": "Ask visitors one question with up to ten answers and let them vote with a single press. You decide when totals show up, either from the start, after someone votes, or once the poll closes on a date you pick. Totals are plain counts that refresh when the page loads or a vote comes in. Each browser gets one vote, kept track of with one cookie, and the site stores only a scrambled copy with no internet address. Voter records are deleted ninety days after closing and the totals stay. It needs Layout Builder to place it on a page.",
+        "description": "Ask visitors one question with two to ten answers and let them vote with a single press. You decide when totals show up, either from the start, after someone votes, or once the poll closes on a date you pick. Totals are plain counts that refresh when the page loads or a vote comes in. Each browser gets one vote, kept track of with one cookie, and the site stores only a scrambled copy with no internet address. Voter records are deleted ninety days after closing and the totals stay. It needs Layout Builder to place it on a page.",
         "problem": "Site owners want a quick show of hands without a full form or people voting over and over.",
         "outcome": "Visitors vote in one click and see plain totals at the moment you chose.",
         "faq": [

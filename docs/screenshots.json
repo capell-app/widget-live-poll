@@ -1,7 +1,8 @@
 {
     "package": "widget-live-poll",
     "composerName": "capell-app/widget-live-poll",
-    "generatedFor": "deployment-screenshot-runner",
+    "generatedFor": "shared-capell-screenshot-runner",
+    "provenancePolicy": "runner-only-v1",
     "requiresInstalledPackage": true,
     "composerRequires": [
         "capell-app/widget-live-poll",

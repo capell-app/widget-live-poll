@@ -41,7 +41,8 @@ final class LimitDailyVotesPerAddressAction
     {
         $count = Cache::get($this->key($poll, $address), 0);
 
-        return is_int($count) ? $count : 0;
+        // The Redis store returns a stored number as a numeric string.
+        return is_numeric($count) ? (int) $count : 0;
     }
 
     private function limit(): int

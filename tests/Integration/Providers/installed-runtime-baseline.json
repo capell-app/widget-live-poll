@@ -151,7 +151,7 @@
                                     "package": "capell-app/widget-live-poll",
                                     "resources": [
                                         [
-                                            "Capell\\Frontend\\Data\\Assets\\FrontendResourceData",
+                                            "Capell\\Core\\Data\\Rendering\\Assets\\FrontendResourceData",
                                             {
                                                 "async": false,
                                                 "criticalCssEligible": false,
@@ -172,7 +172,7 @@
                                             }
                                         ],
                                         [
-                                            "Capell\\Frontend\\Data\\Assets\\FrontendResourceData",
+                                            "Capell\\Core\\Data\\Rendering\\Assets\\FrontendResourceData",
                                             {
                                                 "async": false,
                                                 "criticalCssEligible": false,
@@ -198,7 +198,7 @@
                         },
                         "resources": {
                             "capell-app/widget-live-poll:widget-script": [
-                                "Capell\\Frontend\\Data\\Assets\\FrontendResourceData",
+                                "Capell\\Core\\Data\\Rendering\\Assets\\FrontendResourceData",
                                 {
                                     "async": false,
                                     "criticalCssEligible": false,
@@ -219,7 +219,7 @@
                                 }
                             ],
                             "capell-app/widget-live-poll:widget-style": [
-                                "Capell\\Frontend\\Data\\Assets\\FrontendResourceData",
+                                "Capell\\Core\\Data\\Rendering\\Assets\\FrontendResourceData",
                                 {
                                     "async": false,
                                     "criticalCssEligible": false,
