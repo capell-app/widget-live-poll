@@ -6,6 +6,7 @@
     "kind": "package",
     "capellApiVersion": "^1.0",
     "version": "1.0.0",
+    "launchStatus": "preview",
     "description": "One multiple-choice question on a page, one vote per browser, with totals shown when you choose.",
     "product": {
         "group": "Capell Essentials",
